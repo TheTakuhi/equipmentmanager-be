@@ -1,0 +1,95 @@
+server:
+  port: 6080
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+spring:
+  data:
+    jpa:
+      repositories:
+        base-packages: com.interstellar.equipmentmanager.repository
+  datasource:
+    hikari:
+      auto-commit: false
+    username: postgres
+    password: admin
+    url: jdbc:postgresql://localhost:5432/equipmentmanager-db
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        connection:
+          autocommit: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+    auditing: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://staging.int.tieto.com/keycloak/auth
+          jwk-set-uri: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/token
+
+keycloak:
+  auth-server-url: https://staging.int.tieto.com/keycloak/auth
+  realm: staging-realm
+  resource: equipment-manager-fe
+  principal-attribute: preferred_username
+  ssl-required: external
+  use-resource-role-mappings: true
+  bearer-only: true
+
+#keycloak-admin-cli:
+#  client-id: admin-cli
+#  client-secret: Q1Wu0SpXMiQ8B3zDvNOcYQfac39PVAAK
+
+ldapQL:
+  base-url: https://staging.int.tieto.com/ldapql/ldapql-service/
+  auth-token: "efbfbdef-bfbd-5e5e-3aef-bfbdefbfbd43efbfbd7e5253efbfbdefbfbd1f63"
+
+springdoc:
+  swagger-ui:
+    oauth:
+      clientId: equipment-manager-fe
+#  oAuthFlow:
+#    authorizationUrl: https://staging.int.tieto.com/keycloak/auth
+#    tokenUrl: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/token
+  show-actuator: true
+#switcher:
+#  security: true
+
+#scheduler:
+#  enabled: true
+#  lock:
+#    cron: "10 0 10 * * *"
+#  endOfMonth:
+#    cron: "0 0 10 28-31 * ?"
+#  approval-create:
+#    cron: "10 * * * * *"
+
+web:
+  cors:
+    allow-credentials: true
+    allowed-origins: http://localhost:5173, http://127.0.0.1:5173
+    allowed-methods: POST, PUT, DELETE, GET, HEAD, OPTIONS
+    allowed-headers: Content-Type, X-Requested-With, Accept, Authorization, Origin, Access-Control-Request-Method,
+      Access-Control-Request-Headers, Content-Disposition
+
+#mailing:
+#  enabled: false
+#  url: https://appshub.int.tieto.com/mails
+#  token: 9befca54-3596-4ba3-b23d-d6d4fc3d25c6
+#  appName: equipment-manager-fe
+#  sender:
+#    name: EquipmentManager App
+#    email: equipmentmanager@tietoevry.com
