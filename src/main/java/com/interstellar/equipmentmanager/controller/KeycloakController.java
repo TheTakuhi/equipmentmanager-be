@@ -1,9 +1,9 @@
 package com.interstellar.equipmentmanager.controller;
 
 import com.interstellar.equipmentmanager.annotation.AlphaString;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserDTO;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserEditDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.security.service.UserAuthorizationService;
 import com.interstellar.equipmentmanager.service.KeycloakService;
 import com.interstellar.equipmentmanager.service.UserService;

@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.model.dto;
+package com.interstellar.equipmentmanager.model.dto.audit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

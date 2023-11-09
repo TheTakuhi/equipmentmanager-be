@@ -1,8 +1,8 @@
 package com.interstellar.equipmentmanager.service;
 
 import com.interstellar.equipmentmanager.exception.KeycloakUserNotFoundException;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserDTO;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;

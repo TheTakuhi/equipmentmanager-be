@@ -2,10 +2,10 @@ package com.interstellar.equipmentmanager.security.service.imp;
 
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.security.service.UserAuthorizationService;
 import com.interstellar.equipmentmanager.service.KeycloakService;
@@ -47,7 +47,7 @@ public class UserAuthorizationServiceImp implements UserAuthorizationService {
     @Nullable
     public UserCroppedDTO getCurrentUser(@NonNull Authentication authentication) {
         var claims = getUserClaims(authentication);
-        if (claims == null || claims.getLdapId() == null) return null;
+        if (claims == null || claims.getId() == null) return null;
 
         var user = syncUserFromAuth(authentication);
         return mapper.map(user, UserCroppedDTO.class);
@@ -84,8 +84,8 @@ public class UserAuthorizationServiceImp implements UserAuthorizationService {
         KeycloakUserDTO keycloakUser = null;
         if (claims.criticalInfoMissing()) {
             log.info("User [email: {}, login: {}] critical info is missing ...", claims.getEmail(), claims.getLogin());
-            if (claims.getLdapId() != null)
-                keycloakUser = keycloakService.getUserByLdapId(claims.getLdapId(), true);
+            if (claims.getId() != null)
+                keycloakUser = keycloakService.getUserByLdapId(claims.getId(), true);
         } else keycloakUser = mapper.map(claims, KeycloakUserDTO.class);
 
         if (keycloakUser == null) {
@@ -115,7 +115,7 @@ public class UserAuthorizationServiceImp implements UserAuthorizationService {
 
 
         return UserEditDTO.builder()
-                .ldapId(UUID.fromString(ldapId))
+                .id(UUID.fromString(ldapId))
                 .photo(photo)
                 .login(accessToken.getPreferredUsername())
                 .email(accessToken.getEmail())
@@ -162,7 +162,7 @@ public class UserAuthorizationServiceImp implements UserAuthorizationService {
     public @NonNull Boolean hasLdapID(@Nullable UUID ldapId) {
         var claims = getUserClaims(SecurityContextHolder.getContext().getAuthentication());
         if (claims == null) return false;
-        return claims.getLdapId().equals(ldapId);
+        return claims.getId().equals(ldapId);
     }
 
     private List<UserRole> getUserRoles(Authentication authentication) {

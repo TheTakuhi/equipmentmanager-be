@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO;
+package com.interstellar.equipmentmanager.model.dto.keycloak.user.out;
 
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import lombok.*;

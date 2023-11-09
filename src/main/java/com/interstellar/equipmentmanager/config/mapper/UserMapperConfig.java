@@ -1,13 +1,13 @@
 package com.interstellar.equipmentmanager.config.mapper;
 
-import com.interstellar.equipmentmanager.model.dto.ContractCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCreateDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.contract.out.ContractCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.Contract;
-import com.interstellar.equipmentmanager.model.entity.LdapUser;
+import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -142,8 +142,8 @@ public class UserMapperConfig {
         mapper.typeMap(UserEditDTO.class, UserCreateDTO.class).addMappings(
                 em -> {
                     em.skip(UserCreateDTO::setRemoved);
-                    em.map(UserEditDTO::getLdapId, UserCreateDTO::setLdapId);
-                    em.map(UserEditDTO::getLdapId, UserCreateDTO::setId);
+                    em.map(UserEditDTO::getId, UserCreateDTO::setId);
+                    em.map(UserEditDTO::getId, UserCreateDTO::setId);
                     em.map(UserEditDTO::getUserRoles, UserCreateDTO::setUserRoles);
                 }
         );
@@ -154,7 +154,7 @@ public class UserMapperConfig {
 
         mapper.typeMap(LdapUser.class, UserEditDTO.class)
                 .addMappings(em -> {
-                    em.map(LdapUser::getObjectGUID, UserEditDTO::setLdapId);
+                    em.map(LdapUser::getObjectGUID, UserEditDTO::setId);
                     em.map(LdapUser::getUserPrincipalName, UserEditDTO::setLogin);
                     em.skip(UserEditDTO::setUserRoles);
                 });
@@ -173,14 +173,15 @@ public class UserMapperConfig {
 
         mapper.typeMap(KeycloakUserDTO.class, UserCreateDTO.class).addMappings(
                 em -> {
+                    em.map(KeycloakUserDTO::getLdapId, UserCreateDTO::setId);
                     em.skip(UserCreateDTO::setAuditInfo);
                     em.skip(UserCreateDTO::setRemoved);
-                    em.skip(UserCreateDTO::setId);
                 }
         );
 
         mapper.typeMap(KeycloakUserDTO.class, UserEditDTO.class).addMappings(em ->
         {
+            em.map(KeycloakUserDTO::getLdapId, UserEditDTO::setId);
             em.skip(UserEditDTO::setAuditInfo);
         });
     }

@@ -1,6 +1,6 @@
 package com.interstellar.equipmentmanager.service;
 
-import com.interstellar.equipmentmanager.model.entity.LdapUser;
+import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import lombok.NonNull;
 import reactor.core.publisher.Mono;
 

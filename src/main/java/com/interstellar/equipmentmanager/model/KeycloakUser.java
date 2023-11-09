@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.model.entity;
+package com.interstellar.equipmentmanager.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

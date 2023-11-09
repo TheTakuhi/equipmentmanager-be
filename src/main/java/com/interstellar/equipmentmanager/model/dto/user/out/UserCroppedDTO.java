@@ -1,12 +1,14 @@
-package com.interstellar.equipmentmanager.model.dto.UserDTO;
+package com.interstellar.equipmentmanager.model.dto.user.out;
 
-import com.interstellar.equipmentmanager.model.dto.AuditDTO;
-import com.interstellar.equipmentmanager.model.dto.ContractCroppedDTO;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
+
+/*
+    UserCroppedDTO is used to display only necessary information related to specific user.
+*/
 
 @Getter
 @Setter
@@ -14,9 +16,8 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UserCroppedDTO {
     private UUID id;
-    private UUID ldapId;
     private String login;
     private String email;
     private String firstName;
@@ -24,7 +25,6 @@ public class UserDTO {
     private String fullName;
     private String photo;
     private List<UserRole> userRoles;
-    private List<ContractCroppedDTO> ownedContracts;
-    private AuditDTO auditInfo;
+    private List<UUID> ownedContractIds;
     private Boolean removed;
 }
