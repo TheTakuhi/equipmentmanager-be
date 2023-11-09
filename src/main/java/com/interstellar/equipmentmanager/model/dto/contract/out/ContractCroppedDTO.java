@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.model.dto;
+package com.interstellar.equipmentmanager.model.dto.contract.out;
 
 import com.interstellar.equipmentmanager.model.enums.ContractType;
 import lombok.*;

@@ -1,7 +1,7 @@
 package com.interstellar.equipmentmanager.service;
 
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import org.springframework.lang.NonNull;
 
 public interface UserSyncService {

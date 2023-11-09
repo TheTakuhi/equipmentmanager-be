@@ -2,11 +2,11 @@ package com.interstellar.equipmentmanager.service.imp;
 
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserEditDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCreateDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.filter.UserFilter;
 import com.interstellar.equipmentmanager.model.filter.UserSpecifications;
@@ -50,15 +50,15 @@ public class UserServiceImp implements UserService {
     }
 
     private void requireValidUser(@NonNull User user) {
-        if (user.getLdapId() == null) return;
-        var problems = userRepository.findAllByLdapIdAndRemoved(user.getLdapId(), false)
+        if (user.getId() == null) return;
+        var problems = userRepository.findAllByLdapIdAndRemoved(user.getId(), false)
                 .stream().filter(u -> !u.getId().equals(user.getId()))
                 .toList();
 
         if (!problems.isEmpty()) {
             var message = "User with ldpaId: [%s] intersects with users with id [%s]"
                     .formatted(
-                            user.getLdapId(),
+                            user.getId(),
                             problems.stream().map(u -> u.getId().toString()).collect(Collectors.joining())
                     );
             throw new ResourceConflictException(message);
@@ -118,7 +118,7 @@ public class UserServiceImp implements UserService {
 
         if (syncRolesToKeycloak) {
             keycloakService.updateUserInKeycloak(
-                    res.getLdapId(),
+                    res.getId(),
                     new KeycloakUserEditDTO(res.getUserRoles())
             );
         }

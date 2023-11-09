@@ -22,11 +22,8 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
-    @Column(length = 36, name = "user_id", updatable = false, nullable = false)
+    @Column(length = 36, name = "id", updatable = false, nullable = false)
     private UUID id;
-
-    @Column(name = "ldap_number")
-    private UUID ldapId;
 
     @Column(name = "login")
     @NotNull

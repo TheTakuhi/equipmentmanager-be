@@ -1,6 +1,6 @@
 package com.interstellar.equipmentmanager.security;
 
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCreateDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.service.UserService;
 import com.nimbusds.jose.shaded.gson.Gson;

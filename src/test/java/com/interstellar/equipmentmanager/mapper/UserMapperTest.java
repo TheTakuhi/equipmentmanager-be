@@ -4,11 +4,11 @@ import com.interstellar.equipmentmanager.config.ModelMapperConfig;
 import com.interstellar.equipmentmanager.config.mapper.UserMapperConfig;
 import com.interstellar.equipmentmanager.faker.TestFakeGeneratorProvider;
 import com.interstellar.equipmentmanager.helper.TestPrinter;
-import com.interstellar.equipmentmanager.model.dto.KeycloakUserDTO.KeycloakUserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCreateDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.instancio.junit.InstancioExtension;
@@ -99,7 +99,7 @@ public class UserMapperTest {
         log.info(TestPrinter.prettifyObjectPrint(keycloakUserDTO));
         var res = mapper.map(keycloakUserDTO, UserCreateDTO.class);
 
-        assertThat(res.getLdapId()).isEqualTo(keycloakUserDTO.getLdapId());
+        assertThat(res.getId()).isEqualTo(keycloakUserDTO.getLdapId());
         assertThat(res.getLogin()).isEqualTo(keycloakUserDTO.getLogin());
         assertThat(res.getEmail()).isEqualTo(keycloakUserDTO.getEmail());
         assertThat(res.getUserRoles()).isEqualTo(keycloakUserDTO.getUserRoles());
@@ -111,9 +111,10 @@ public class UserMapperTest {
         mapper.typeMap(KeycloakUserDTO.class, UserEditDTO.class);
 
         log.info(TestPrinter.prettifyObjectPrint(keycloakUserDTO));
-        var res = mapper.map(keycloakUserDTO, UserCreateDTO.class);
+        var res = mapper.map(keycloakUserDTO, UserEditDTO.class);
+        log.info(TestPrinter.prettifyObjectPrint(res));
 
-        assertThat(res.getLdapId()).isEqualTo(keycloakUserDTO.getLdapId());
+        assertThat(res.getId()).isEqualTo(keycloakUserDTO.getLdapId());
         assertThat(res.getLogin()).isEqualTo(keycloakUserDTO.getLogin());
         assertThat(res.getEmail()).isEqualTo(keycloakUserDTO.getEmail());
         assertThat(res.getUserRoles()).isEqualTo(keycloakUserDTO.getUserRoles());

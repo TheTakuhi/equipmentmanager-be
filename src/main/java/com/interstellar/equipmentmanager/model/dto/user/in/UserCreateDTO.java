@@ -1,12 +1,15 @@
-package com.interstellar.equipmentmanager.model.dto.UserDTO;
+package com.interstellar.equipmentmanager.model.dto.user.in;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.model.entity.AuditInfo;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,39 +19,31 @@ import java.util.UUID;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEditDTO {
-
+public class UserCreateDTO {
     @JsonIgnore
-    private UUID ldapId;
+    private UUID id;
 
-    @JsonIgnore
+    @NotNull
+    @NotBlank
     private String login;
-
-    @JsonIgnore
     @Email
+    @NotNull @NotBlank
     private String email;
 
-    @JsonIgnore
     private String photo;
 
-    @JsonIgnore
     @AlphaString
+    @NotNull @NotBlank
     private String firstName;
-
-    @JsonIgnore
-    @AlphaString
+    @AlphaString @NotNull @NotBlank
     private String lastName;
 
-    private List<UserRole> userRoles;
+    @NotNull
+    private List<UserRole> userRoles = new ArrayList<>(List.of(UserRole.GUEST));
 
     @JsonIgnore
     private AuditInfo auditInfo;
 
-    public boolean nonCriticalInfoMissing() {
-        return firstName == null || photo == null;
-    }
-
-    public boolean criticalInfoMissing() {
-        return ldapId == null ||  login == null || email == null || lastName == null;
-    }
+    @JsonIgnore
+    private boolean removed = false;
 }

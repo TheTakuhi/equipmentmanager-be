@@ -1,6 +1,6 @@
 package com.interstellar.equipmentmanager.service.imp;
 
-import com.interstellar.equipmentmanager.model.entity.LdapUser;
+import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.service.ReactiveLdapQLService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

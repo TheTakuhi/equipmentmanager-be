@@ -1,9 +1,9 @@
 package com.interstellar.equipmentmanager.service;
 
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCreateDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserDTO;
-import com.interstellar.equipmentmanager.model.dto.UserDTO.UserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.filter.UserFilter;
 import lombok.NonNull;
