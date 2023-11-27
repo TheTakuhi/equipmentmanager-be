@@ -18,7 +18,7 @@ import java.util.UUID;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID>, JpaSpecificationExecutor<User> {
     Page<User> findAll(Specification<User> spec, Pageable pageable);
-    Optional<User> findByLdapIdAndRemoved(@NonNull UUID ldapId, boolean removed);
+    Optional<User> findByIdAndRemoved(@NonNull UUID ldapId, boolean removed);
     List<User> findAllByEmailAndRemoved(@NonNull @NotBlank @Email String email, boolean removed);
-    List<User> findAllByLdapIdAndRemoved(@NonNull UUID ldapId, boolean removed);
+    List<User> findAllByIdAndRemoved(@NonNull UUID ldapId, boolean removed);
 }
