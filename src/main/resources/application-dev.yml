@@ -18,7 +18,7 @@ spring:
       auto-commit: false
     username: postgres
     password: admin
-    url: jdbc:postgresql://localhost:5432/equipmentmanager-db
+    url: jdbc:postgresql://equipment-manager-db:5432/equipment-manager-db
   jpa:
     hibernate:
       ddl-auto: update

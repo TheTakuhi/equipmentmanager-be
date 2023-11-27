@@ -39,7 +39,7 @@ public class UserSyncServiceImp implements UserSyncService {
     public @NonNull UserDTO syncUserFromKeycloak(@NonNull KeycloakUserDTO keycloakUser) {
         Optional<User> userOpt = keycloakUser.getLdapId() == null ?
                 Optional.empty() :
-                userRepository.findByLdapIdAndRemoved(keycloakUser.getLdapId(), false);
+                userRepository.findByIdAndRemoved(keycloakUser.getLdapId(), false);
 
         if (userOpt.isEmpty() && keycloakUser.getEmail() != null)
         {
@@ -79,7 +79,7 @@ public class UserSyncServiceImp implements UserSyncService {
             keycloakUser.getUserRoles().sort(Comparator.comparing(UserRole::getPower));
 
             if (keycloakUser.getUserRoles().equals(origRoles) &&
-                Instant.now().toEpochMilli() - auditInfo.getLastModifiedAt().toEpochMilli() < 60_000) {
+                    Instant.now().toEpochMilli() - auditInfo.getLastModifiedAt().toEpochMilli() < 60_000) {
                 return mapper.map(user, UserDTO.class);
             }
 

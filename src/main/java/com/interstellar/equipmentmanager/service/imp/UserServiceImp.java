@@ -51,7 +51,7 @@ public class UserServiceImp implements UserService {
 
     private void requireValidUser(@NonNull User user) {
         if (user.getId() == null) return;
-        var problems = userRepository.findAllByLdapIdAndRemoved(user.getId(), false)
+        var problems = userRepository.findAllByIdAndRemoved(user.getId(), false)
                 .stream().filter(u -> !u.getId().equals(user.getId()))
                 .toList();
 
@@ -75,7 +75,7 @@ public class UserServiceImp implements UserService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public UserDTO getUserByLdapId(@NonNull UUID ldapId) {
-        var user = userRepository.findByLdapIdAndRemoved(ldapId, false)
+        var user = userRepository.findByIdAndRemoved(ldapId, false)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(User.class.getName(), "ldapId", ldapId.toString()));
         return mapper.map(user, UserDTO.class);
