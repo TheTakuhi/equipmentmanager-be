@@ -18,7 +18,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @Table(name = "users")
-@ToString
 @EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
@@ -61,7 +60,7 @@ public class User {
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "user_role")
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
+    @Column(name = "\"role\"", nullable = false)
     @NotNull
     private List<UserRole> userRoles;
 
