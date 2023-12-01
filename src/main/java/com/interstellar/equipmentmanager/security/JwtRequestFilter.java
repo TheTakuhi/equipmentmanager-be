@@ -35,7 +35,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String json = gson.toJson(claims.get("resource_access"));
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
 
-        String jsonRoles = jsonObject.get("escape-game-fe").getAsJsonObject().get("roles").toString();
+        String jsonRoles = jsonObject.get("equipment-manager-fe").getAsJsonObject().get("roles").toString();
         List<UserRole> roles = new ArrayList<>();
         gson.fromJson(jsonRoles, List.class).forEach(role -> roles.add(
                 UserRole.valueOf((String) role)
