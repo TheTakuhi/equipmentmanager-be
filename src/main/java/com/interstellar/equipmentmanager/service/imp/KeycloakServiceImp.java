@@ -27,9 +27,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class KeycloakServiceImp  implements KeycloakService {
     private final Keycloak keycloak;
     private final ModelMapper mapper;
