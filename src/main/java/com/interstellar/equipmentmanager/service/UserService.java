@@ -10,6 +10,8 @@ import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -18,6 +20,9 @@ public interface UserService {
 
     UserDTO getUserById(@NonNull UUID id);
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    User getUserByLogin(@NonNull String login);
+    
     UserDTO getUserByLdapId(@NonNull UUID ldapId);
 
     User getOriginalUser(@NonNull UUID id);

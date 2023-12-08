@@ -17,15 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.representations.AccessToken;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +36,9 @@ public class UserAuthorizationServiceImp implements UserAuthorizationService {
     private final KeycloakService keycloakService;
     private final UserSyncService userSyncService;
 
+    @Value("${keycloak.resource}")
+    private String keycloakResource;
+    
     @Override
     @Nullable
     public UserCroppedDTO getCurrentUser() {
@@ -103,26 +105,45 @@ public class UserAuthorizationServiceImp implements UserAuthorizationService {
      */
     @Override
     public UserEditDTO getUserClaims(@NonNull Authentication authentication) {
-        KeycloakPrincipal<?> principal = (KeycloakPrincipal<?>) authentication.getPrincipal();
-
-        AccessToken accessToken = principal.getKeycloakSecurityContext().getToken();
-
-        Map<String, Object> claims = accessToken.getOtherClaims();
-
-        String ldapId = (String) claims.get("LDAP_ID");
-        String employeeId = (String) claims.get("employeeId");
-        String photo = (String) claims.get("photo");
-
-
-        return UserEditDTO.builder()
-                .id(UUID.fromString(ldapId))
-                .photo(photo)
-                .login(accessToken.getPreferredUsername())
-                .email(accessToken.getEmail())
-                .firstName(accessToken.getGivenName())
-                .lastName(accessToken.getFamilyName())
-                .userRoles(getUserRoles(authentication))
-                .build();
+        if (authentication instanceof JwtAuthenticationToken) {
+            JwtAuthenticationToken jwtToken = (JwtAuthenticationToken) authentication;
+            Map<String, Object> claims = jwtToken.getTokenAttributes();
+            Map<String, Object> resourceAccess = (Map<String, Object>) jwtToken.getTokenAttributes().get("resource_access");
+            
+            List<String> roles = Collections.emptyList();
+            if (resourceAccess != null) {
+                Map<String, Object> clientRoles = (Map<String, Object>) resourceAccess.get(keycloakResource);
+                
+                if (clientRoles != null) {
+                    // Extract roles from clientRoles and return
+                    roles = (List<String>) clientRoles.get("roles");
+                }
+            }
+            
+            String ldapId = (String) claims.get("LDAP_ID");
+            String photo = (String) claims.get("photo");
+            
+            return UserEditDTO.builder()
+                    .id(UUID.fromString(ldapId))
+                    .photo(photo)
+                    .login((String) claims.get("preferred_username"))
+                    .email((String) claims.get("email"))
+                    .firstName((String) claims.get("given_name"))
+                    .lastName((String) claims.get("family_name"))
+                    .userRoles(roles.stream()
+                            .map(g -> {
+                                try {
+                                    return UserRole.valueOf(g);
+                                } catch (IllegalArgumentException e) {
+                                    return null;
+                                }
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList()))
+                    .build();
+        } else {
+            throw new IllegalArgumentException("Unsupported authentication token type");
+        }
     }
 
     /**
