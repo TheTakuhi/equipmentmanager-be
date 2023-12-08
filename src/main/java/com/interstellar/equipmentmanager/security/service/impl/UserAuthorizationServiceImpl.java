@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.security.service.imp;
+package com.interstellar.equipmentmanager.security.service.impl;
 
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
@@ -14,8 +14,6 @@ import com.interstellar.equipmentmanager.service.UserSyncService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.representations.AccessToken;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
@@ -30,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserAuthorizationServiceImp implements UserAuthorizationService {
+public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     private final ModelMapper mapper;
     private final ReactiveLdapQLService reactiveLdapQLService;
     private final KeycloakService keycloakService;

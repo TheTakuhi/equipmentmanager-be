@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.service.imp;
+package com.interstellar.equipmentmanager.service.impl;
 
 import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.service.ReactiveLdapQLService;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ReactiveLdapQLServiceImp implements ReactiveLdapQLService {
+public class ReactiveLdapQLServiceImpl implements ReactiveLdapQLService {
     @Value("${ldapQL.auth-token}")
     private String authToken;
 
