@@ -64,9 +64,9 @@ springdoc:
     disable-swagger-default-url: false
     oauth:
       clientId: equipment-manager-fe
-      oAuthFlow:
-        authorizationUrl: https://staging.int.tieto.com/keycloak/auth
-        tokenUrl: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/token
+  oAuthFlow:
+    authorizationUrl: https://staging.int.tieto.com/keycloak/auth
+    tokenUrl: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/token
   show-actuator: true
 
 #switcher:

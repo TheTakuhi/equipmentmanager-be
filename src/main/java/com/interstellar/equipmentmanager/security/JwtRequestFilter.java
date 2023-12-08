@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
@@ -58,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer")){
             try{
                 handleUserFromToken(
                         decode(authorizationHeader)
@@ -71,16 +72,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     private void handleUserFromToken(Map<String, Object> claims){
-//        try{
-//            userService.getByUsername(claims.get("preferred_username").toString());
-//        } catch (NotFoundException e){
+        try{
+            userService.getUserByLogin(claims.get("preferred_username").toString());
+        } catch (NotFoundException e){
             UserCreateDTO userCreateDTO = new UserCreateDTO();
             userCreateDTO.setId(UUID.fromString(claims.get("LDAP_ID").toString()));
+            userCreateDTO.setFirstName(claims.get("preferred_username").toString());
             userCreateDTO.setFirstName(claims.get("given_name").toString());
             userCreateDTO.setLastName(claims.get("family_name").toString());
             userCreateDTO.setEmail(claims.get("email").toString());
             userCreateDTO.setUserRoles(extractRoles(claims));
             userService.createUser(userCreateDTO);
-//        }
+        }
     }
 }

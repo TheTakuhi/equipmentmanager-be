@@ -71,6 +71,12 @@ public class UserServiceImp implements UserService {
         return mapper.map(getOriginalUser(id), UserDTO.class);
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public User getUserByLogin(@NonNull String login) {
+        return userRepository.findByLogin(login).orElseThrow(
+                () -> new ResourceNotFoundException(User.class.getName(), "login", login));
+    }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
