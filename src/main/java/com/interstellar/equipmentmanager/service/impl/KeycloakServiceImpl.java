@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.service.imp;
+package com.interstellar.equipmentmanager.service.impl;
 
 import com.interstellar.equipmentmanager.exception.KeycloakUserNotFoundException;
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class KeycloakServiceImp  implements KeycloakService {
+public class KeycloakServiceImpl implements KeycloakService {
     private final Keycloak keycloak;
     private final ModelMapper mapper;
     @Value("${keycloak.realm}")

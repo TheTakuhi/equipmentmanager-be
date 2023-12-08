@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.service.imp;
+package com.interstellar.equipmentmanager.service.impl;
 
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImp implements UserService {
+public class UserServiceImpl implements UserService {
     private final ModelMapper mapper;
     private final UserRepository userRepository;
     private final KeycloakService keycloakService;

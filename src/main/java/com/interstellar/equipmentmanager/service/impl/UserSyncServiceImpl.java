@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.service.imp;
+package com.interstellar.equipmentmanager.service.impl;
 
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
@@ -29,7 +29,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserSyncServiceImp implements UserSyncService {
+public class UserSyncServiceImpl implements UserSyncService {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ModelMapper mapper;
