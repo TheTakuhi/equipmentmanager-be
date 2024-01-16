@@ -88,7 +88,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
     public User getOriginalUser(@NonNull UUID id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class.getName(), "id", id.toString()));

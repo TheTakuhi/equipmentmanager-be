@@ -27,3 +27,5 @@ INSERT INTO contracts (contract_id, contract_type, end_date, start_date, contrac
 INSERT INTO contracts (contract_id, contract_type, end_date, start_date, contract_owner_id) VALUES ('259abff8-737b-4bfb-bf42-f3a8589680d7', 'DPC', '2025-01-01', '2023-01-01', '9f969e35-17b7-450e-8d95-e60e8c76309d');
 INSERT INTO contracts (contract_id, contract_type, end_date, start_date, contract_owner_id) VALUES ('159abff8-737b-4bfb-bf42-f3a8589680d7', 'DPC', '2025-01-01', '2023-01-01', '8f969e35-17b7-450e-8d95-e60e8c76309d');
 INSERT INTO contracts (contract_id, contract_type, end_date, start_date, contract_owner_id) VALUES ('059abff8-737b-4bfb-bf42-f3a8589680d7', 'DPC', '2025-01-01', '2023-01-01', '7f969e35-17b7-450e-8d95-e60e8c76309d');
+
+INSERT INTO items (creation_date, item_id, owner_id, comment, quality_state, serial_code, state, type) VALUES ('2023-12-22', '0a6c47b9-a966-40ff-bb9f-db5ce6f5f24d', '5b77ffd8-92e4-4e7f-9e7f-e0206e68006e', 'už ne tak fajnový stolík', 'USED','86748615641345', 'AVAILABLE', 'TABLE');
