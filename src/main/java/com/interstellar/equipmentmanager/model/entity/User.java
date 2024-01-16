@@ -67,6 +67,9 @@ public class User {
     @OneToMany(mappedBy = "contractOwner", orphanRemoval = true)
     private List<Contract> ownedContracts;
 
+    @OneToMany(mappedBy = "owner")
+    private List<Item> ownedItems;
+
     @Embedded
     private AuditInfo auditInfo = new AuditInfo();
 
