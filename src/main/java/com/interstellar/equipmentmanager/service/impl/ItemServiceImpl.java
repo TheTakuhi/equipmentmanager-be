@@ -25,7 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -74,23 +77,32 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public ItemDTO getItemById(UUID id) {
+    public ItemDTO getItemDTOById(UUID id) {
         Item item = itemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Item.class.getName(), "id", id.toString()));
         return mapper.map(item, ItemDTO.class);
     }
 
     @Override
+    public Item getItemById(UUID id) {
+        Item item = itemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Item.class.getName(), "id", id.toString()));
+        return item;
+    }
+
+
+    @Override
     @Transactional
     public void deleteItemById(UUID itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ResourceNotFoundException(Item.class.getName(), "id", itemId.toString()));
-        if(!item.getState().equals(State.BORROWED)){
+        if (!item.getState().equals(State.BORROWED)) {
             item.setState(State.DISCARDED);
-        }else{
+        } else {
             throw new ResourceConflictException(String.format("Item with id %s cannot be deleted, because it is currently borrowed.", itemId.toString()));
         }
         itemRepository.save(item);
     }
 
+
+    //todo manager can see only his and team members items
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Page<ItemDTO> getAllItems(@Nullable ItemFilter filter, @Nullable Pageable pageable) {
@@ -107,7 +119,24 @@ public class ItemServiceImpl implements ItemService {
         var items = itemRepository.findAll(spec, pageable);
         return items.map(u -> mapper.map(u, ItemDTO.class));
     }
-    //todo
-    //    nelze smazat pujceny item
-    //    pri smazani usera predat itemy
+
+    @Override
+    public List<ItemDTO> findAllItemsByOwnerIdNotDiscarded(UUID id) {
+
+        return itemRepository.findAllByOwnerIdAndBeingDiscarded(id).stream().map(i -> mapper.map(i, ItemDTO.class)).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public void changeOwnerOfItems(UUID fromUserId, UUID toUserId) {
+        List<Item> items = itemRepository.findAllByOwnerIdAndBeingDiscarded(fromUserId);
+        User toUser = userService.getOriginalUser(toUserId);
+        items.forEach(i -> {
+            if (!i.getState().equals(State.DISCARDED)) {
+                i.setOwner(toUser);
+            }
+        });
+
+        itemRepository.saveAll(items);
+    }
 }

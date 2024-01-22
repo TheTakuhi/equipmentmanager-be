@@ -1,6 +1,5 @@
 package com.interstellar.equipmentmanager.controller;
 
-
 import com.interstellar.equipmentmanager.model.dto.CustomPageDTO;
 import com.interstellar.equipmentmanager.model.dto.item.in.ItemCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.item.in.ItemEditDTO;
@@ -27,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -59,7 +59,7 @@ public class ItemController {
     }, description = "Create item with currently logged user as owner")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER') || @userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public ItemDTO createItem(@RequestBody ItemCreateDTO itemCreateDTO) {
         return itemService.createItem(itemCreateDTO);
     }
@@ -174,6 +174,50 @@ public class ItemController {
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public ItemDTO getItem(@PathVariable UUID id) {
 
-        return itemService.getItemById(id);
+        return itemService.getItemDTOById(id);
     }
+
+    @Operation(summary = "Get Items by owner id that are discarded", responses = {
+            @ApiResponse(
+                    description = "Return items successful",
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            ),
+            @ApiResponse(
+                    description = "User is not authorized to do this operation",
+                    responseCode = "403",
+                    content = @Content
+            ),
+    }, description = "Get Items by owner id that are discarded")
+    @GetMapping("/by-owner/{id}}")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
+    public List<ItemDTO> findAllDiscardedAndByUser(@PathVariable UUID id) {
+        return itemService.findAllItemsByOwnerIdNotDiscarded(id);
+    }
+
+
+    @Operation(summary = "Change owner of all items that are not discarded", responses = {
+            @ApiResponse(
+                    description = "Change of owner is successful",
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            ),
+            @ApiResponse(
+                    description = "User is not authorized to do this operation",
+                    responseCode = "403",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    description = "User has not been found",
+                    responseCode = "404",
+                    content = @Content
+            )
+    }, description = "Change owner of all items that are not discarded")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping("/from/{fromUserId}/to/{toUserId}")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
+    public void changeOwnerOfItems(@PathVariable UUID fromUserId, @PathVariable UUID toUserId) {
+        itemService.changeOwnerOfItems(fromUserId, toUserId);
+    }
+
 }
