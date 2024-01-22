@@ -99,14 +99,11 @@ public class UserServiceImpl implements UserService {
         if (pageable == null) pageable = Pageable.ofSize(Integer.MAX_VALUE);
         if (filter == null) filter = new UserFilter();
 
-        Specification<User> spec = UserSpecifications.filterUsers(
+        var users = userRepository.findAll(
                 filter.getLogin() == null ? null : String.format("%%%s%%", filter.getLogin()),
                 filter.getFullName() == null ? null : String.format("%%%s%%", filter.getFullName()),
                 filter.getUserRoles(),
-                filter.getIncludeRemovedUser() != null && filter.getIncludeRemovedUser()
-        );
-
-        var users = userRepository.findAll(spec, pageable);
+                filter.getIncludeRemovedUser() != null && filter.getIncludeRemovedUser(), pageable);
         return users.map(u -> mapper.map(u, UserCroppedDTO.class));
     }
 
