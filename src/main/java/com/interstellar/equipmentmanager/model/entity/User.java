@@ -9,6 +9,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -69,6 +70,12 @@ public class User {
 
     @OneToMany(mappedBy = "owner")
     private List<Item> ownedItems;
+
+    @OneToMany(mappedBy = "borrower")
+    private List<Loan> borrowings;
+
+    @OneToMany(mappedBy = "lender")
+    private List<Loan> loans;
 
     @Embedded
     private AuditInfo auditInfo = new AuditInfo();
