@@ -154,8 +154,8 @@ public class UserController {
                 standardPage.getContent().size(),
                 standardPage.getContent(),
                 pageable,
-                standardPage.getTotalPages()>pageable.getPageNumber()+1,
-                pageable.getPageNumber()>0
+                standardPage.getTotalPages() > pageable.getPageNumber() + 1,
+                pageable.getPageNumber() > 0
         );
     }
 
