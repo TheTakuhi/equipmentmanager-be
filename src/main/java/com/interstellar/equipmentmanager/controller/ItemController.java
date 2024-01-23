@@ -189,7 +189,7 @@ public class ItemController {
                     content = @Content
             ),
     }, description = "Get Items by owner id that are discarded")
-    @GetMapping("/by-owner/{id}}")
+    @GetMapping("/by-owner/{id}")
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
     public List<ItemDTO> findAllDiscardedAndByUser(@PathVariable UUID id) {
         return itemService.findAllItemsByOwnerIdNotDiscarded(id);
