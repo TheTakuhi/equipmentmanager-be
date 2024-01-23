@@ -85,7 +85,7 @@ web:
   cors:
     allow-credentials: true
     allowed-origins: http://localhost:3000, http://127.0.0.1:3000, http://localhost:5173, http://127.0.0.1:5173
-    allowed-methods: POST, PUT, DELETE, GET, HEAD, OPTIONS
+    allowed-methods: POST, PUT, DELETE, GET, HEAD, OPTIONS, PATCH
     allowed-headers: Content-Type, X-Requested-With, Accept, Authorization, Origin, Access-Control-Request-Method,
       Access-Control-Request-Headers, Content-Disposition
 
