@@ -15,6 +15,5 @@ public class LdapUser {
     private String email;
     private String firstname;
     private String lastname;
-    private String userPrincipalName;
-    private String thumbnailPhoto;
+    private String login;
 }

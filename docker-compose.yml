@@ -20,7 +20,7 @@ services:
     build:
       dockerfile: Dockerfile
     ports:
-      - "8080:6080"
+      - "8080:8080"
     depends_on:
       - equipment-manager-db
     restart: on-failure

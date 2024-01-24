@@ -23,4 +23,4 @@ EXPOSE $SERVER_PORT
 ARG PROFILE=dev
 ENV SPRING_PROFILES_ACTIVE=$PROFILE
 
-ENTRYPOINT [ "java", "-jar", "app.jar" ]
+ENTRYPOINT [ "java", "--enable-preview", "-jar", "app.jar" ]

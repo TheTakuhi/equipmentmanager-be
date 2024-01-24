@@ -1,8 +1,6 @@
 package com.interstellar.equipmentmanager.model.entity;
 
-import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -32,26 +30,26 @@ public class User {
 
     @Column(name = "email")
     @NotNull
-    @NotBlank
-    @Email
+//    @NotBlank
+//    @Email // this annotation is not correct regex for some users in AD
     private String email;
 
     @Column(name = "first_name")
     @NotNull
     @NotBlank
-    @AlphaString
+//    @AlphaString
     private String firstName;
 
     @Column(name = "last_name")
     @NotNull
     @NotBlank
-    @AlphaString
+//    @AlphaString
     private String lastName;
 
     @Column(name = "full_name")
     @NotNull
     @NotBlank
-    @AlphaString
+//    @AlphaString
     private String fullName;
 
     @Lob
@@ -68,14 +66,11 @@ public class User {
     @OneToMany(mappedBy = "contractOwner", orphanRemoval = true)
     private List<Contract> ownedContracts;
 
+    @OneToMany(mappedBy = "contractManager", orphanRemoval = true)
+    private List<Contract> managedContracts;
+
     @OneToMany(mappedBy = "owner")
     private List<Item> ownedItems;
-
-    @OneToMany(mappedBy = "borrower")
-    private List<Loan> borrowings;
-
-    @OneToMany(mappedBy = "lender")
-    private List<Loan> loans;
 
     @Embedded
     private AuditInfo auditInfo = new AuditInfo();

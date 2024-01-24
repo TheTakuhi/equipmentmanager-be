@@ -19,6 +19,8 @@ public class ItemMapperConfig {
 
     private final Converter<Item, UUID> itemToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
 
+    private final Converter<ItemCroppedDTO, UUID> itemCroppedToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
+
     private final Converter<UUID, Item> idToItem = ctx -> {
         if (ctx.getSource() == null) {
             return null;
@@ -32,19 +34,23 @@ public class ItemMapperConfig {
     public void ItemConverting() {
         mapper.typeMap(Item.class, UUID.class).setConverter(itemToId);
         mapper.typeMap(UUID.class, Item.class).setConverter(idToItem);
+        mapper.typeMap(ItemCroppedDTO.class, UUID.class).setConverter(itemCroppedToId);
         mapper.typeMap(Item.class, ItemDTO.class).addMappings(
                 em -> {
                     em.map(Item::getOwner, ItemDTO::setOwner);
+                    em.map(Item::getLoans, ItemDTO::setLoans);
                 }
         );
         mapper.typeMap(ItemDTO.class, Item.class).addMappings(
                 em -> {
                     em.map(ItemDTO::getOwner, Item::setOwner);
+                    em.map(ItemDTO::getLoans, Item::setLoans);
                 }
         );
         mapper.typeMap(Item.class, ItemCroppedDTO.class).addMappings(
                 em -> {
                     em.map(Item::getOwner, ItemCroppedDTO::setOwnerId);
+                    em.map(Item::getLoans, ItemCroppedDTO::setLoansId);
                 }
         );
         mapper.typeMap(ItemEditDTO.class, Item.class).addMappings(

@@ -6,17 +6,13 @@ import lombok.*;
 import java.util.List;
 import java.util.UUID;
 
-/*
-    UserCroppedDTO is used to display only necessary information related to specific user.
- */
-
 @Getter
 @Setter
 @Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCroppedDTO {
+public class CurrentUserDTO {
     private UUID id;
     private String login;
     private String email;
@@ -25,11 +21,4 @@ public class UserCroppedDTO {
     private String fullName;
     private String photo;
     private List<UserRole> userRoles;
-    private List<UUID> ownedContractIds;
-    private Boolean removed;
-    private List<UUID> teamsIds;
-    private List<UUID> ownedTeamsIds;
-    private List<UUID> loansIds;
-    private List<UUID> ownedItemsIds;
-    private List<UUID> borrowingsIds;
 }

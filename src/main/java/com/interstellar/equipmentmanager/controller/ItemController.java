@@ -126,7 +126,7 @@ public class ItemController {
                     responseCode = "403",
                     content = @Content
             )
-    }, description = "Only MANAGER and ADMIN can see all items")
+    }, description = "Only ADMIN can see all items")
     @GetMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public CustomPageDTO<ItemDTO> getItems(
@@ -138,8 +138,10 @@ public class ItemController {
             @RequestParam(required = false) State state,
             @Parameter(description = "Search by item quality state", schema = @Schema(implementation = QualityState.class))
             @RequestParam(required = false) QualityState qualityState,
+            @Parameter(description = "Search with discarded items", schema = @Schema(implementation = Boolean.class))
+            @RequestParam(required = false) Boolean includeDiscarded,
             @PageableDefault(size = 50) Pageable pageable) {
-        var filter = new ItemFilter(serialCode, type, state, qualityState);
+        var filter = new ItemFilter(serialCode, type, state, qualityState, includeDiscarded);
         var standardPage = itemService.getAllItems(filter, pageable);
         return new CustomPageDTO<>(
                 standardPage.getTotalElements(),
@@ -170,7 +172,7 @@ public class ItemController {
                     content = @Content
             )
     }, description = "Get Item by its id")
-    @GetMapping("/{id}}")
+    @GetMapping("/{id}")
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public ItemDTO getItem(@PathVariable UUID id) {
 
@@ -218,6 +220,44 @@ public class ItemController {
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
     public void changeOwnerOfItems(@PathVariable UUID fromUserId, @PathVariable UUID toUserId) {
         itemService.changeOwnerOfItems(fromUserId, toUserId);
+    }
+
+    @Operation(summary = "Get all Quality States possibilities", responses = {
+            @ApiResponse(
+                    description = "Return list successful",
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            ),
+            @ApiResponse(
+                    description = "User is not authorized to do this operation",
+                    responseCode = "403",
+                    content = @Content
+            ),
+    }, description = "Get all Quality States possibilities in list")
+    @GetMapping("/item-quality-states")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
+    public List<String> getQualityStates() {
+
+        return itemService.getQualityStates();
+    }
+
+    @Operation(summary = "Get all Item Types possibilities", responses = {
+            @ApiResponse(
+                    description = "Return list successful",
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            ),
+            @ApiResponse(
+                    description = "User is not authorized to do this operation",
+                    responseCode = "403",
+                    content = @Content
+            ),
+    }, description = "Get allItem Types possibilities in list")
+    @GetMapping("/item-types")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
+    public List<String> getItemTypes() {
+
+        return itemService.getItemTypes();
     }
 
 }

@@ -4,9 +4,9 @@ import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
-import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.filter.UserFilter;
 import com.interstellar.equipmentmanager.repository.UserRepository;
@@ -64,7 +64,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRED)
     public UserDTO getUserById(@NonNull UUID id) {
         return mapper.map(getOriginalUser(id), UserDTO.class);
     }
@@ -75,6 +74,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByLogin(login).orElseThrow(
                 () -> new ResourceNotFoundException(User.class.getName(), "login", login));
     }
+
+
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -87,8 +88,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getOriginalUser(@NonNull UUID id) {
-        return userRepository.findById(id).orElseThrow(
+        User user = userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(User.class.getName(), "id", id.toString()));
+        return user;
     }
 
     @Override
@@ -133,4 +135,7 @@ public class UserServiceImpl implements UserService {
         user.setRemoved(true);
         userRepository.save(user);
     }
+
+    //todo getAllMyPeople
+
 }

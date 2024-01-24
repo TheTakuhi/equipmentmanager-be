@@ -34,4 +34,8 @@ public interface ItemService {
     List<ItemDTO> findAllItemsByOwnerIdNotDiscarded(UUID id);
 
     void changeOwnerOfItems(UUID fromUserId, UUID toUserId);
+
+    List<String> getQualityStates();
+
+    List<String> getItemTypes();
 }

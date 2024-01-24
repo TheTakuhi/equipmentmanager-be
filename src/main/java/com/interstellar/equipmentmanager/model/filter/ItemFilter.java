@@ -15,4 +15,5 @@ public class ItemFilter {
     private Type type;
     private State state;
     private QualityState qualityState;
+    private Boolean includeDiscarded;
 }

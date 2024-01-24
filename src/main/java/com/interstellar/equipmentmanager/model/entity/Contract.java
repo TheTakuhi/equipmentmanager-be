@@ -28,21 +28,9 @@ public class Contract {
     @Column(name = "contract_id", length = 36, updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "start_date")
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    @NotNull
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    private LocalDate endDate;
-
-    @Column(name = "contract_type")
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private ContractType contractType;
-
     @ManyToOne(optional = false)
     private User contractOwner;
+
+    @ManyToOne(optional = true)
+    private User contractManager;
 }
