@@ -6,6 +6,7 @@ import com.interstellar.equipmentmanager.model.enums.Type;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -30,4 +31,7 @@ public class ItemCroppedDTO {
     private LocalDate creationDate;
 
     private UUID ownerId;
+
+    private List<UUID> loansId;
+
 }

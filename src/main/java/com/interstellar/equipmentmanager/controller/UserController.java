@@ -12,6 +12,7 @@ import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.model.filter.UserFilter;
 import com.interstellar.equipmentmanager.security.service.UserAuthorizationService;
 import com.interstellar.equipmentmanager.service.UserService;
+import com.interstellar.equipmentmanager.service.UserSyncService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final UserSyncService userSyncService;
     private final UserAuthorizationService userAuthorizationService;
 //    private final MailService mailService;
 
@@ -88,8 +91,9 @@ public class UserController {
             ),
     }, description = "Entity is not synced automatically with keycloak")
     @GetMapping("/current")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
     public UserDTO getCurrentUser() {
-        var currentUser = userAuthorizationService.getCurrentUser();
+        var currentUser = userAuthorizationService.getCurrentUserCropped();
         if (currentUser == null)
             throw new ResourceNotFoundException(
                     User.class.getSimpleName(),
@@ -154,8 +158,8 @@ public class UserController {
                 standardPage.getContent().size(),
                 standardPage.getContent(),
                 pageable,
-                standardPage.getTotalPages() > pageable.getPageNumber() + 1,
-                pageable.getPageNumber() > 0
+                standardPage.getTotalPages()>pageable.getPageNumber()+1,
+                pageable.getPageNumber()>0
         );
     }
 
@@ -185,9 +189,6 @@ public class UserController {
             @Parameter(description = "Keycloak flag for auto sync", schema = @Schema(implementation = Boolean.class, defaultValue = "false"))
             @RequestParam(defaultValue = "false") Boolean syncRolesToKeycloak) {
         UserDTO user = userService.updateUser(id, userEditDTO, syncRolesToKeycloak);
-//        if (userEditDTO.getUserRoles() != null) {
-//            mailService.sendUserUpdateMail(id);
-//        }
         return user;
     }
 
@@ -225,5 +226,17 @@ public class UserController {
     @GetMapping("/roles")
     public List<UserRole> getAvailableRoles() {
         return Arrays.stream(UserRole.values()).collect(Collectors.toList());
+    }
+
+    @Operation(summary = "Sync missing users from LDAPQL",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            ), description = "Only ADMIN can sync users"
+    )
+    @PostMapping("/sync")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
+    public void syncUsers() {
+        userSyncService.syncAllUsersFromLdapQL();
     }
 }

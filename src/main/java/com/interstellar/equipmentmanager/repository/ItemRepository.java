@@ -18,8 +18,8 @@ import java.util.UUID;
 public interface ItemRepository extends JpaRepository<Item, UUID>, JpaSpecificationExecutor<Item> {
     Page<Item> findAll(Specification<Item> spec, Pageable pageable);
 
-    @Query("SELECT i FROM Item i WHERE i.id = :id AND i.state = 'DISCARDED'")
-    List<Item> findAllByOwnerIdAndBeingDiscarded(@NonNull @Param("id") UUID id);
+    @Query("SELECT i FROM Item i WHERE i.owner.id = :ownerId AND i.state != 'DISCARDED'")
+    List<Item> findAllByOwnerIdAndNotDiscarded(@NonNull @Param("ownerId") UUID id);
 
 
 }

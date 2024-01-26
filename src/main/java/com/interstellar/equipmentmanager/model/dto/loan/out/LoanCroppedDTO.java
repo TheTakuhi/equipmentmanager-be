@@ -14,7 +14,8 @@ public class LoanCroppedDTO {
 
     private UUID id;
     private UUID itemId;
-    private UUID userId;
+    private UUID lenderId;
+    private UUID borrowerId;
     private String loanDate;
     private String returnDate;
 }

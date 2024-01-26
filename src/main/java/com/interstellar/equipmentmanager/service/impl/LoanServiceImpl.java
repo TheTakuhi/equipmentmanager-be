@@ -9,6 +9,7 @@ import com.interstellar.equipmentmanager.model.entity.Item;
 import com.interstellar.equipmentmanager.model.entity.Loan;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.enums.State;
+import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.model.filter.LoanFilter;
 import com.interstellar.equipmentmanager.model.filter.LoanSpecifications;
 import com.interstellar.equipmentmanager.repository.LoanRepository;
@@ -46,8 +47,7 @@ public class LoanServiceImpl implements LoanService {
         User currentUser = userService.getOriginalUser(userAuthorizationService.getCurrentUser().getId());
         Item item = itemService.getItemById(loan.getItem().getId());
 
-//        if (canUserLendItem(currentUser, item) || item.getOwner().equals(currentUser)) {
-        if (item.getOwner().equals(currentUser)) {
+        if (canUserLendItem(currentUser, item) || item.getOwner().equals(currentUser) || currentUser.getUserRoles().contains(UserRole.ADMIN)) {
             loan.setBorrower(userService.getOriginalUser(loan.getBorrower().getId()));
             loan.setLender(mapper.map(userAuthorizationService.getCurrentUser(), User.class));
 
@@ -63,14 +63,9 @@ public class LoanServiceImpl implements LoanService {
         return mapper.map(loanRepository.save(loan), LoanDTO.class);
     }
 
-//    private boolean canUserLendItem(User user, Item item) {
-//        for (Team team : user.getTeams()) {
-//            if (team.getMembers().contains(user) && team.getMembers().contains(item.getOwner())) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    private boolean canUserLendItem(User user, Item item) {
+        return true;
+    }
 
     @Override
     public LoanDTO getLoanDTOById(UUID id) {
@@ -105,7 +100,7 @@ public class LoanServiceImpl implements LoanService {
                 filter.getType(),
                 filter.getBorrowerName() == null ? null : String.format("%%%s%%", filter.getBorrowerName()),
                 filter.getLenderName() == null ? null : String.format("%%%s%%", filter.getLenderName()),
-                userAuthorizationService.getCurrentUser().getId()
+                userAuthorizationService.getCurrentUser().getUserRoles().contains(UserRole.ADMIN) ? null : userAuthorizationService.getCurrentUser().getId()
         );
 
         var loans = loanRepository.findAll(spec, pageable);

@@ -1,6 +1,7 @@
 package com.interstellar.equipmentmanager.config;
 
-import org.keycloak.admin.client.Keycloak;
+import org.keycloak.adapters.KeycloakConfigResolver;
+import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +18,12 @@ public class KeycloakConfig {
     private String clientSecret;
 
     @Bean
-    public Keycloak keycloak() {
-        return Keycloak.getInstance(
-                keycloakUrl,
-                realm,
-                clientId,
-                clientSecret);
+    public KeycloakConfigResolver keycloak() {
+        return new KeycloakSpringBootConfigResolver();
+//        return Keycloak.getInstance(
+//                keycloakUrl,
+//                realm,
+//                clientId,
+//                clientSecret);
     }
 }

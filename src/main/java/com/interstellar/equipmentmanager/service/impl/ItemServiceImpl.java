@@ -7,7 +7,10 @@ import com.interstellar.equipmentmanager.model.dto.item.in.ItemEditDTO;
 import com.interstellar.equipmentmanager.model.dto.item.out.ItemDTO;
 import com.interstellar.equipmentmanager.model.entity.Item;
 import com.interstellar.equipmentmanager.model.entity.User;
+import com.interstellar.equipmentmanager.model.enums.QualityState;
 import com.interstellar.equipmentmanager.model.enums.State;
+import com.interstellar.equipmentmanager.model.enums.Type;
+import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.model.filter.ItemFilter;
 import com.interstellar.equipmentmanager.model.filter.ItemSpecifications;
 import com.interstellar.equipmentmanager.repository.ItemRepository;
@@ -44,7 +47,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO createItem(ItemCreateDTO itemCreateDTO) {
         Item item = new Item();
         mapper.map(itemCreateDTO, item);
-        item.setOwner(mapper.map(userAuthorizationService.getCurrentUser(), User.class));
+
+        item.setOwner(userService.getOriginalUser(itemCreateDTO.getOwnerId()));
         item.setState(State.AVAILABLE);
         return mapper.map(itemRepository.save(item), ItemDTO.class);
     }
@@ -58,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
         item.setQualityState(itemEditDTO.getQualityState());
         item.setState(itemEditDTO.getState());
 
-        if (itemEditDTO.getOwnerId() != null) {
+        if (itemEditDTO.getOwnerId() != null && !itemEditDTO.getOwnerId().equals(item.getOwner().getId())) {
             User user = userService.getOriginalUser(itemEditDTO.getOwnerId());
             item.getOwner().getOwnedItems().remove(item);
             item.setOwner(user);
@@ -101,8 +105,6 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.save(item);
     }
 
-
-    //todo manager can see only his and team members items
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Page<ItemDTO> getAllItems(@Nullable ItemFilter filter, @Nullable Pageable pageable) {
@@ -113,7 +115,9 @@ public class ItemServiceImpl implements ItemService {
                 filter.getSerialCode() == null ? null : String.format("%%%s%%", filter.getSerialCode()),
                 filter.getType(),
                 filter.getState(),
-                filter.getQualityState()
+                filter.getQualityState(),
+                filter.getIncludeDiscarded() == null ? null : filter.getIncludeDiscarded(),
+                userAuthorizationService.getCurrentUser().getUserRoles().contains(UserRole.ADMIN) ? null : userAuthorizationService.getCurrentUser().getId()
         );
 
         var items = itemRepository.findAll(spec, pageable);
@@ -123,20 +127,35 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDTO> findAllItemsByOwnerIdNotDiscarded(UUID id) {
 
-        return itemRepository.findAllByOwnerIdAndBeingDiscarded(id).stream().map(i -> mapper.map(i, ItemDTO.class)).collect(Collectors.toList());
+        return itemRepository.findAllByOwnerIdAndNotDiscarded(id).stream().map(i -> mapper.map(i, ItemDTO.class)).collect(Collectors.toList());
     }
 
-
+    @Transactional
     @Override
     public void changeOwnerOfItems(UUID fromUserId, UUID toUserId) {
-        List<Item> items = itemRepository.findAllByOwnerIdAndBeingDiscarded(fromUserId);
+        List<Item> items = itemRepository.findAllByOwnerIdAndNotDiscarded(fromUserId);
         User toUser = userService.getOriginalUser(toUserId);
         items.forEach(i -> {
             if (!i.getState().equals(State.DISCARDED)) {
+                User originalOwner = i.getOwner();
+                if (originalOwner != null) {
+                    originalOwner.getOwnedItems().remove(i);
+                }
                 i.setOwner(toUser);
+                toUser.getOwnedItems().add(i);
             }
         });
 
         itemRepository.saveAll(items);
+    }
+
+    @Override
+    public List<String> getQualityStates(){
+        return QualityState.asStringList();
+    }
+
+    @Override
+    public List<String> getItemTypes(){
+        return Type.asStringList();
     }
 }

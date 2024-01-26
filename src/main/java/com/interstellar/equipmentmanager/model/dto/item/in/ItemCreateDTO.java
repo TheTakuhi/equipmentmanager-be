@@ -4,6 +4,8 @@ import com.interstellar.equipmentmanager.model.enums.QualityState;
 import com.interstellar.equipmentmanager.model.enums.Type;
 import lombok.*;
 
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -18,4 +20,7 @@ public class ItemCreateDTO {
     private Type type;
 
     private QualityState qualityState;
+
+    private UUID ownerId;
+
 }

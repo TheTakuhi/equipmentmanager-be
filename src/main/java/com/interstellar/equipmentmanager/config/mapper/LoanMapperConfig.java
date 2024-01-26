@@ -1,6 +1,7 @@
 package com.interstellar.equipmentmanager.config.mapper;
 
 import com.interstellar.equipmentmanager.model.dto.loan.in.LoanCreateDTO;
+import com.interstellar.equipmentmanager.model.dto.loan.out.LoanCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.loan.out.LoanDTO;
 import com.interstellar.equipmentmanager.model.entity.Loan;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,8 @@ public class LoanMapperConfig {
 
     private final Converter<Loan, UUID> loanToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
 
+    private final Converter<LoanCroppedDTO, UUID> loanDTOToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
+
     private final Converter<UUID, Loan> idToLoan = ctx -> {
         if (ctx.getSource() == null) {
             return null;
@@ -35,7 +38,7 @@ public class LoanMapperConfig {
             return null;
         }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        formatter = formatter.withLocale(Locale.UK);
+        formatter = formatter.withLocale( Locale.UK );
         LocalDate date = LocalDate.parse(ctx.getSource().getLoanDate(), formatter);
         return date;
     };
@@ -43,6 +46,7 @@ public class LoanMapperConfig {
     @Bean
     public void LoanConverting() {
         mapper.typeMap(Loan.class, UUID.class).setConverter(loanToId);
+        mapper.typeMap(LoanCroppedDTO.class, UUID.class).setConverter(loanDTOToId);
         mapper.typeMap(UUID.class, Loan.class).setConverter(idToLoan);
         mapper.typeMap(LoanCreateDTO.class, Loan.class).addMappings(
                 em -> {
@@ -56,6 +60,13 @@ public class LoanMapperConfig {
                     em.map(Loan::getBorrower, LoanDTO::setBorrowerCroppedDTO);
                     em.map(Loan::getLender, LoanDTO::setLenderCroppedDTO);
                     em.map(Loan::getItem, LoanDTO::setItemCroppedDTO);
+                }
+        );
+        mapper.typeMap(Loan.class, LoanCroppedDTO.class).addMappings(
+                em -> {
+                    em.map(Loan::getBorrower, LoanCroppedDTO::setBorrowerId);
+                    em.map(Loan::getLender, LoanCroppedDTO::setLenderId);
+                    em.map(Loan::getItem, LoanCroppedDTO::setItemId);
                 }
         );
     }

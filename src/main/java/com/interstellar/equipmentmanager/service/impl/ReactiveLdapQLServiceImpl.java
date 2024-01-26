@@ -1,80 +1,146 @@
 package com.interstellar.equipmentmanager.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.interstellar.equipmentmanager.exception.InternalServerErrorException;
 import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
+import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.service.ReactiveLdapQLService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ReactiveLdapQLServiceImpl implements ReactiveLdapQLService {
-    @Value("${ldapQL.auth-token}")
-    private String authToken;
 
-    @Value("${ldapQL.base-url}")
-    private String baseUrl;
+    @Qualifier("ldapQLClient")
+    private final WebClient client;
 
     @Override
     public @NonNull Mono<List<LdapUser>> findUserByEmail(@NonNull String email) {
-        var client = WebClient.builder()
-                .filters(exchangeFilterFunctions ->
-                        exchangeFilterFunctions.addAll(List.of(logRequest(), logResponse())))
-                .baseUrl(baseUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
 
 
-        var ql2 = "query { findActiveDirectoryUsersByEmail(email: \\\"%s\\\") ".formatted(email) +
-                "{ objectGUID lastname firstname email thumbnailPhoto userPrincipalName } }";
+        var query = """
+            query {
+                findActiveDirectoryUsersByEmail(email: %s) {
+                    objectGUID
+                    lastname
+                    firstname
+                    email
+                    login
+                }
+            }""".formatted(email);
 
         return client.post()
                 .uri("/graphql")
-                .header("auth-token", authToken)
-                .bodyValue("{\"query\": \"%s\"}".formatted(ql2))
+                .bodyValue(createBodyValue(query))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<QueryResponse<FindUsersByEmail>>() {
                 })
                 .onErrorResume(WebClientException.class, (ex) -> {log.info("Error happened {}", ex.getMessage()); return Mono.empty();})
                 .map(r -> {
-                    if (r.data == null || r.data.findActiveDirectoryUsersByEmail == null) return  new ArrayList<>();
+                    if (r.data == null || r.data.findActiveDirectoryUsersByEmail == null) return new ArrayList<>();
                     return Arrays.stream(r.data.findActiveDirectoryUsersByEmail).collect(Collectors.toList());
                 });
     }
 
-    private ExchangeFilterFunction logRequest() {
-        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            log.info("Web client sent url: {}", clientRequest.url().getPath());
-            return Mono.just(clientRequest);
-        });
+    @Override
+    public Flux<List<LdapUser>> findAllUsers() {
+
+        var query = """
+            query {
+                findAllActiveDirectoryUsers {
+                    objectGUID
+                    lastname
+                    firstname
+                    email
+                    login
+                }
+            }
+        """;
+
+        return this.client.post()
+                .uri("/graphql")
+                .bodyValue(createBodyValue(query))
+                .retrieve()
+                .bodyToFlux(new ParameterizedTypeReference<QueryResponse<FindAllUsers>>() {})
+                .onErrorResume(WebClientException.class, (ex) -> {log.info("Error happened {}", ex.getMessage()); return Mono.empty();})
+                .map(r -> {
+                    if (r.data == null || r.data.findAllActiveDirectoryUsers == null) return new ArrayList<>();
+                    return Arrays.stream(r.data.findAllActiveDirectoryUsers).collect(Collectors.toList());
+                });
     }
 
-    private  ExchangeFilterFunction logResponse() {
-        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
-            log.info("Web client sent url: {}", clientResponse.statusCode());
-            return Mono.just(clientResponse);
-        });
+    @Override
+    public Mono<List<LdapUser>> findAllUsersNotIn(List<User> users)  {
+        StringBuilder uuids = new StringBuilder();
+
+        for (User user : users) {
+            uuids.append(user.getId()).append(",");
+        }
+
+        if (!users.isEmpty()) {
+            uuids.deleteCharAt(uuids.length() - 1);
+        }
+
+        var query = """
+            query {
+                findAllOthersActiveDirectoryUsers(objectGUIDs: "%s") {
+                    objectGUID
+                    lastname
+                    firstname
+                    email
+                    login
+                }
+            }""".formatted(uuids.toString());
+
+
+        return client.post()
+                .uri("/graphql")
+                .bodyValue(createBodyValue(query))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<QueryResponse<FindAllOthersActiveDirectoryUsers>>() {
+                })
+                .onErrorResume(WebClientException.class, (ex) -> {log.info("Error happened {}", ex.getMessage()); return Mono.empty();})
+                .map(r -> {
+                    if (r.data == null || r.data.findAllOthersActiveDirectoryUsers == null) return new ArrayList<>();
+                    return Arrays.stream(r.data.findAllOthersActiveDirectoryUsers).collect(Collectors.toList());
+                });
     }
 
+    private String createBodyValue(String query) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return objectMapper.writeValueAsString(Map.of("query", query));
+        } catch (JsonProcessingException e) {
+            throw new InternalServerErrorException("JSON mapping error occurred in graphql query");
+        }
+    }
 
     private record QueryResponse<T>(T data) {
     }
 
     private record FindUsersByEmail(LdapUser[] findActiveDirectoryUsersByEmail) {
+    }
+
+    private record FindAllUsers(LdapUser[] findAllActiveDirectoryUsers) {
+    }
+
+    private record FindAllOthersActiveDirectoryUsers(LdapUser[] findAllOthersActiveDirectoryUsers) {
     }
 }

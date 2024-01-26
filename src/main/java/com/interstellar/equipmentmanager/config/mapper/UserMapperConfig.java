@@ -9,6 +9,7 @@ import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.Contract;
 import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.model.entity.User;
+import com.interstellar.equipmentmanager.model.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.Converter;
@@ -23,22 +24,21 @@ import java.util.UUID;
 @Configuration
 @RequiredArgsConstructor
 public class UserMapperConfig {
+
     private final ModelMapper mapper;
     private final Converter<User, UUID> userToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
 
     private final Converter<UUID, User> idToUser = ctx -> {
-        if (ctx.getSource() == null) {
+        if (ctx.getSource() == null)
             return null;
-        }
         var user = new User();
         user.setId(ctx.getSource());
         return user;
     };
 
     private final Converter<UserCreateDTO, String> fullName = ctx -> {
-        if (ctx.getSource() == null) {
+        if (ctx.getSource() == null)
             return null;
-        }
         return ctx.getSource().getFirstName() + ctx.getSource().getLastName();
     };
 
@@ -62,6 +62,14 @@ public class UserMapperConfig {
             ids.add(contractCroppedDTO.getId());
         }
         return ids;
+    };
+
+    private final Converter<List<UserRole>, List<UserRole>> assignUserRoles = ctx -> {
+        if(ctx.getSource().isEmpty())
+        {
+            return List.of(UserRole.GUEST);
+        }
+        else return ctx.getSource();
     };
 
     private final Converter<List<Contract>, List<UUID>> contractToId = ctx -> {
@@ -120,16 +128,6 @@ public class UserMapperConfig {
         mapper.typeMap(UserDTO.class, UUID.class).setConverter(userDTOToId);
         mapper.typeMap(UserCroppedDTO.class, UUID.class).setConverter(userCroppedDTOToId);
 
-        mapper.typeMap(User.class, UserCroppedDTO.class).addMappings(em -> {
-            em.using(contractToId).map(User::getOwnedContracts, UserCroppedDTO::setOwnedContractIds);
-        });
-
-        mapper.typeMap(UserDTO.class, UserCroppedDTO.class)
-                .addMappings(em ->
-                        em.using(contractCroppedDTOToId)
-                                .map(UserDTO::getOwnedContracts, UserCroppedDTO::setOwnedContractIds)
-                );
-
         mapper.typeMap(UserCreateDTO.class, User.class).addMappings(em -> {
             em.skip(User::setOwnedContracts);
             em.using(fullName).map(u -> u, User::setFullName);
@@ -155,8 +153,17 @@ public class UserMapperConfig {
         mapper.typeMap(LdapUser.class, UserEditDTO.class)
                 .addMappings(em -> {
                     em.map(LdapUser::getObjectGUID, UserEditDTO::setId);
-                    em.map(LdapUser::getUserPrincipalName, UserEditDTO::setLogin);
+                    em.map(LdapUser::getLogin, UserEditDTO::setLogin);
                     em.skip(UserEditDTO::setUserRoles);
+                });
+        mapper.typeMap(LdapUser.class, User.class)
+                .addMappings(em -> {
+                    em.map(LdapUser::getObjectGUID, User::setId);
+                    em.map(LdapUser::getLogin, User::setLogin);
+                    em.map(LdapUser::getLastname, User::setLastName);
+                    em.map(LdapUser::getFirstname, User::setFirstName);
+                    em.map(LdapUser::getEmail, User::setEmail);
+                    em.skip(User::setUserRoles);
                 });
 
         mapper.typeMap(UserEditDTO.class, User.class).addMappings(
@@ -167,7 +174,6 @@ public class UserMapperConfig {
                     em.skip(User::setOwnedContracts);
                 }
         );
-        mapper.typeMap(User.class, User.class);
 
         mapper.typeMap(UserRepresentation.class, KeycloakUserDTO.class).setConverter(representationToKeycloak);
 
@@ -183,6 +189,11 @@ public class UserMapperConfig {
         {
             em.map(KeycloakUserDTO::getLdapId, UserEditDTO::setId);
             em.skip(UserEditDTO::setAuditInfo);
+        });
+
+        mapper.typeMap(KeycloakUserDTO.class, User.class).addMappings(em -> {
+            em.map(KeycloakUserDTO::getLdapId, User::setId);
+            em.map(KeycloakUserDTO::getUserRoles, User::setUserRoles);
         });
     }
 }

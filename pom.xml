@@ -17,6 +17,7 @@
     <properties>
         <java.version>21</java.version>
         <spring.profiles.active>dev</spring.profiles.active>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
     <dependencies>
         <dependency>
@@ -150,6 +151,12 @@
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
             <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java-generator</groupId>
+            <artifactId>graphql-java-client-dependencies</artifactId>
+            <version>2.3.2</version>
+            <type>pom</type>
         </dependency>
 
     </dependencies>

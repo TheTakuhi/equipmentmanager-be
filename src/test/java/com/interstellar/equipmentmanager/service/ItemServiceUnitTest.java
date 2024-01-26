@@ -66,7 +66,7 @@ public class ItemServiceUnitTest {
         User user = new User();
         ItemDTO itemDTO = new ItemDTO();
 
-        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUser);
+        when(userAuthorizationService.getCurrentUser());
 
         Item item = new Item();
 
@@ -120,7 +120,7 @@ public class ItemServiceUnitTest {
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
         when(mapper.map(item, ItemDTO.class)).thenReturn(itemDTO);
-        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUser);
+        when(userAuthorizationService.getCurrentUser());
 
         boolean result = itemService.isOwner(itemId);
 
@@ -147,7 +147,7 @@ public class ItemServiceUnitTest {
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
         when(mapper.map(item, ItemDTO.class)).thenReturn(itemDTO);
-        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUser);
+        when(userAuthorizationService.getCurrentUser());
 
         boolean result = itemService.isOwner(itemId);
 

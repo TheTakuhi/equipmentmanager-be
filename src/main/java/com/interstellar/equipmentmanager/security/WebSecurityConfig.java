@@ -32,13 +32,13 @@ public class WebSecurityConfig {
 
     @Value("${web.cors.allowed-origins}")
     private List<String> allowedOrigins;
-    
+
     @Value("${web.cors.allowed-methods}")
     private List<String> allowedMethods;
-    
+
     @Value("${web.cors.allowed-headers}")
     private List<String> allowedHeaders;
-    
+
     private static final String[] AUTH_WHITELIST = {
             // -- Swagger UI v2
             "/v2/api-docs",
@@ -90,6 +90,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers("/users/sync").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
