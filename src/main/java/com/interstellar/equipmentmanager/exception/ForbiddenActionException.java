@@ -4,4 +4,6 @@ public class ForbiddenActionException extends RuntimeException {
     public ForbiddenActionException(String massage) {
         super(massage);
     }
+
+
 }

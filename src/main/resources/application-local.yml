@@ -7,7 +7,6 @@ management:
     web:
       exposure:
         include: health, info
-
 spring:
   sql:
     init:
@@ -18,7 +17,7 @@ spring:
       auto-commit: true
     username: postgres
     password: admin
-    url: jdbc:postgresql://equipment-manager-db:5432/equipment-manager-db
+    url: jdbc:postgresql://localhost:5434/equipment-manager-db
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -61,9 +60,9 @@ ldapQL:
 springdoc:
   swagger-ui:
     enabled: true
-    disable-swagger-default-url: false
     oauth:
       clientId: equipment-manager-fe
+    disable-swagger-default-url: false
   oAuthFlow:
     authorizationUrl: https://staging.int.tieto.com/keycloak/auth
     tokenUrl: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/token
@@ -76,12 +75,18 @@ scheduler:
   timezone: Europe/Prague
   syncUsersFromLdap:
     cron: "0 0 2 * * *"
+#  lock:
+#    cron: "10 0 10 * * *"
+#  endOfMonth:
+#    cron: "0 0 10 28-31 * ?"
+#  approval-create:
+#    cron: "10 * * * * *"
 
 web:
   cors:
     allow-credentials: true
     allowed-origins: http://localhost:3000, http://127.0.0.1:3000, http://localhost:5173, http://127.0.0.1:5173
-    allowed-methods: POST, PUT, DELETE, GET, HEAD, OPTIONS, PATCH
+    allowed-methods: POST, PUT, DELETE, GET, HEAD, OPTIONS
     allowed-headers: Content-Type, X-Requested-With, Accept, Authorization, Origin, Access-Control-Request-Method,
       Access-Control-Request-Headers, Content-Disposition
 

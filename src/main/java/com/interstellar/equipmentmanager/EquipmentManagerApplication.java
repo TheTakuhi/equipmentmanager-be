@@ -17,3 +17,6 @@ public class EquipmentManagerApplication {
 		SpringApplication.run(EquipmentManagerApplication.class, args);
 	}
 }
+
+
+//todo sending emails?

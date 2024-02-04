@@ -1,5 +1,7 @@
 package com.interstellar.equipmentmanager.model.dto.loan.out;
 
+import com.interstellar.equipmentmanager.model.dto.item.out.ItemCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import lombok.*;
 
 import java.util.UUID;
