@@ -111,7 +111,7 @@ public class UserServiceUnitTest {
 
         when(userRepository.findByLogin(eq(login))).thenReturn(Optional.of(expectedUser));
 
-        User result = userService.getUserByLogin(login);
+        User result = userService.getUserBylogin(login);
 
         assertNotNull(result);
     }

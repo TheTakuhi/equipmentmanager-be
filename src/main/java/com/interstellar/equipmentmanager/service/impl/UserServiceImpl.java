@@ -1,5 +1,6 @@
 package com.interstellar.equipmentmanager.service.impl;
 
+import com.interstellar.equipmentmanager.exception.ForbiddenActionException;
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;
@@ -9,6 +10,7 @@ import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.filter.UserFilter;
+import com.interstellar.equipmentmanager.model.filter.UserSpecifications;
 import com.interstellar.equipmentmanager.repository.UserRepository;
 import com.interstellar.equipmentmanager.service.KeycloakService;
 import com.interstellar.equipmentmanager.service.UserService;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -70,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public User getUserByLogin(@NonNull String login) {
+    public User getUserBylogin(@NonNull String login) {
         return userRepository.findByLogin(login).orElseThrow(
                 () -> new ResourceNotFoundException(User.class.getName(), "login", login));
     }
@@ -132,6 +135,9 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteUserById(@NonNull UUID id) {
         var user = getOriginalUser(id);
+        if(user.getTeams().size() > 0){
+            throw new ForbiddenActionException(String.format("User with id %s cannot be removed because he/she is owner of number of teams (%s).", user.getId().toString(), String.valueOf(user.getTeams().size())));
+        }
         user.setRemoved(true);
         userRepository.save(user);
     }

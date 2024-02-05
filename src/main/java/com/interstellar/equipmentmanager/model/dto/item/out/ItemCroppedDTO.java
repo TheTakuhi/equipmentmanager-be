@@ -1,5 +1,6 @@
 package com.interstellar.equipmentmanager.model.dto.item.out;
 
+import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import com.interstellar.equipmentmanager.model.enums.QualityState;
 import com.interstellar.equipmentmanager.model.enums.State;
 import com.interstellar.equipmentmanager.model.enums.Type;

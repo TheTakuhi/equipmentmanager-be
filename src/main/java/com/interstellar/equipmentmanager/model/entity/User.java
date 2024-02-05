@@ -1,6 +1,7 @@
 package com.interstellar.equipmentmanager.model.entity;
 
 import com.interstellar.equipmentmanager.model.enums.UserRole;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -69,8 +70,24 @@ public class User {
     @OneToMany(mappedBy = "contractManager", orphanRemoval = true)
     private List<Contract> managedContracts;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_teams",
+            joinColumns = @JoinColumn(name = "users_id"),
+            inverseJoinColumns = @JoinColumn(name = "teams_id"))
+    private List<Team> teams;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Team> ownedTeams;
+
     @OneToMany(mappedBy = "owner")
     private List<Item> ownedItems;
+
+    @OneToMany(mappedBy = "borrower")
+    private List<Loan> borrowings;
+
+    @OneToMany(mappedBy = "lender")
+    private List<Loan> loans;
 
     @Embedded
     private AuditInfo auditInfo = new AuditInfo();

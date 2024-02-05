@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.lang.StringTemplate.STR;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,16 +37,16 @@ public class ReactiveLdapQLServiceImpl implements ReactiveLdapQLService {
     public @NonNull Mono<List<LdapUser>> findUserByEmail(@NonNull String email) {
 
 
-        var query = """
+        var query = STR."""
             query {
-                findActiveDirectoryUsersByEmail(email: %s) {
+                findActiveDirectoryUsersByEmail(email: \{email}) {
                     objectGUID
                     lastname
                     firstname
                     email
                     login
                 }
-            }""".formatted(email);
+            }""";
 
         return client.post()
                 .uri("/graphql")
@@ -98,17 +100,17 @@ public class ReactiveLdapQLServiceImpl implements ReactiveLdapQLService {
             uuids.deleteCharAt(uuids.length() - 1);
         }
 
-        var query = """
-            query {
-                findAllOthersActiveDirectoryUsers(objectGUIDs: "%s") {
-                    objectGUID
-                    lastname
-                    firstname
-                    email
-                    login
+        String query = STR."""
+                query {
+                    findAllOthersActiveDirectoryUsers(objectGUIDs: "\{uuids.toString()}") {
+                        objectGUID
+                        lastname
+                        firstname
+                        email
+                        login
+                    }
                 }
-            }""".formatted(uuids.toString());
-
+               """;
 
         return client.post()
                 .uri("/graphql")

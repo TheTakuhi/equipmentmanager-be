@@ -7,6 +7,7 @@ import com.interstellar.equipmentmanager.model.dto.loan.in.LoanCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.loan.out.LoanDTO;
 import com.interstellar.equipmentmanager.model.entity.Item;
 import com.interstellar.equipmentmanager.model.entity.Loan;
+import com.interstellar.equipmentmanager.model.entity.Team;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.enums.State;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
@@ -64,7 +65,12 @@ public class LoanServiceImpl implements LoanService {
     }
 
     private boolean canUserLendItem(User user, Item item) {
-        return true;
+        for (Team team : user.getTeams()) {
+            if (team.getMembers().contains(user) && team.getMembers().contains(item.getOwner())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

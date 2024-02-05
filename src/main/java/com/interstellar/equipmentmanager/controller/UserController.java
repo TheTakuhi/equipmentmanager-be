@@ -3,6 +3,7 @@ package com.interstellar.equipmentmanager.controller;
 import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
 import com.interstellar.equipmentmanager.model.dto.CustomPageDTO;
+import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
