@@ -4,10 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.model.entity.AuditInfo;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,22 +22,24 @@ public class UserCreateDTO {
     @JsonIgnore
     private UUID id;
 
-    @NotNull
-    @NotBlank
+    @Size(max = 7, min = 7, message = "Login must be 7 characters long")
     private String login;
+
     @Email
-    @NotNull @NotBlank
+    @NotBlank(message = "Email is mandatory")
     private String email;
 
     private String photo;
 
     @AlphaString
-    @NotNull @NotBlank
+    @NotBlank(message = "First name is mandatory")
     private String firstName;
-    @AlphaString @NotNull @NotBlank
+
+    @AlphaString
+    @NotBlank(message = "Last name is mandatory")
     private String lastName;
 
-    @NotNull
+    @NotEmpty(message = "UserRoles cannot be empty")
     private List<UserRole> userRoles = new ArrayList<>(List.of(UserRole.GUEST));
 
     @JsonIgnore

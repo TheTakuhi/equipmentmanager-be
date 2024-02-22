@@ -1,14 +1,12 @@
 package com.interstellar.equipmentmanager.config.mapper;
 
-import com.interstellar.equipmentmanager.model.dto.contract.out.ContractCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
+import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
-import com.interstellar.equipmentmanager.model.entity.Contract;
-import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -55,16 +53,6 @@ public class UserMapperConfig {
         return ctx.getSource().getId();
     };
 
-    private final Converter<List<ContractCroppedDTO>, List<UUID>> contractCroppedDTOToId = ctx -> {
-        if (ctx.getSource() == null)
-            return null;
-        List<UUID> ids = new ArrayList<>();
-        for (ContractCroppedDTO contractCroppedDTO : ctx.getSource()) {
-            ids.add(contractCroppedDTO.getId());
-        }
-        return ids;
-    };
-
     private final Converter<List<TeamCroppedDTO>, List<UUID>> teamCroppedDTOToId = ctx -> {
         if (ctx.getSource() == null)
             return null;
@@ -80,16 +68,6 @@ public class UserMapperConfig {
             return List.of(UserRole.GUEST);
         }
         else return ctx.getSource();
-    };
-
-    private final Converter<List<Contract>, List<UUID>> contractToId = ctx -> {
-        if (ctx.getSource() == null)
-            return null;
-        List<UUID> ids = new ArrayList<>();
-        for (Contract contract : ctx.getSource()) {
-            ids.add(contract.getId());
-        }
-        return ids;
     };
 
     private final Converter<UserRepresentation, KeycloakUserDTO> representationToKeycloak = ctx -> {
@@ -139,7 +117,6 @@ public class UserMapperConfig {
         mapper.typeMap(UserCroppedDTO.class, UUID.class).setConverter(userCroppedDTOToId);
 
         mapper.typeMap(User.class, UserCroppedDTO.class).addMappings(em -> {
-            em.using(contractToId).map(User::getOwnedContracts, UserCroppedDTO::setOwnedContractIds);
             em.map(User::getTeams, UserCroppedDTO::setTeamsIds);
             em.map(User::getOwnedTeams, UserCroppedDTO::setOwnedTeamsIds);
             em.map(User::getLoans, UserCroppedDTO::setLoansIds);
@@ -149,7 +126,6 @@ public class UserMapperConfig {
 
         mapper.typeMap(UserDTO.class, UserCroppedDTO.class)
                 .addMappings(em -> {
-                            em.using(contractCroppedDTOToId).map(UserDTO::getOwnedContracts, UserCroppedDTO::setOwnedContractIds);
                             em.using(teamCroppedDTOToId).map(UserDTO::getTeams, UserCroppedDTO::setTeamsIds);
                             em.using(teamCroppedDTOToId).map(UserDTO::getOwnedTeams, UserCroppedDTO::setOwnedTeamsIds);
                             em.map(UserDTO::getLoans, UserCroppedDTO::setLoansIds);
@@ -159,13 +135,11 @@ public class UserMapperConfig {
                 );
 
         mapper.typeMap(UserCreateDTO.class, User.class).addMappings(em -> {
-            em.skip(User::setOwnedContracts);
             em.skip(User::setTeams);
             em.using(fullName).map(u -> u, User::setFullName);
         });
 
         mapper.typeMap(User.class, UserDTO.class).addMappings(em -> {
-            em.map(User::getOwnedContracts, UserDTO::setOwnedContracts);
             em.map(User::getTeams, UserDTO::setTeams);
             em.map(User::getOwnedTeams, UserDTO::setOwnedTeams);
             em.map(User::getLoans, UserDTO::setLoans);
@@ -207,7 +181,6 @@ public class UserMapperConfig {
                     em.skip(User::setRemoved);
                     em.skip(User::setAuditInfo);
                     em.skip(User::setFullName);
-                    em.skip(User::setOwnedContracts);
                     em.skip(User::setTeams);
                 }
         );
