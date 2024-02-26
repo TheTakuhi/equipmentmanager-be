@@ -17,6 +17,6 @@ import java.util.List;
 @Getter
 @Setter
 public class KeycloakUserEditDTO {
-    @NotNull
+    @NotNull(message = "UserRoles is a mandatory field")
     private List<UserRole> userRoles;
 }

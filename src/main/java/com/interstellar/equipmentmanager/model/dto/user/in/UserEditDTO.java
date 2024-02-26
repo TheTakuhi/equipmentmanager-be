@@ -5,6 +5,7 @@ import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.model.entity.AuditInfo;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 import java.util.List;
@@ -39,16 +40,9 @@ public class UserEditDTO {
     @AlphaString
     private String lastName;
 
+    @NotEmpty(message = "UserRoles is a mandatory field")
     private List<UserRole> userRoles;
 
     @JsonIgnore
     private AuditInfo auditInfo;
-
-    public boolean nonCriticalInfoMissing() {
-        return firstName == null || photo == null;
-    }
-
-    public boolean criticalInfoMissing() {
-        return id == null ||  login == null || email == null || lastName == null;
-    }
 }

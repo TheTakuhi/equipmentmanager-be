@@ -25,7 +25,6 @@ public class UserCroppedDTO {
     private String fullName;
     private String photo;
     private List<UserRole> userRoles;
-    private List<UUID> ownedContractIds;
     private Boolean removed;
     private List<UUID> teamsIds;
     private List<UUID> ownedTeamsIds;

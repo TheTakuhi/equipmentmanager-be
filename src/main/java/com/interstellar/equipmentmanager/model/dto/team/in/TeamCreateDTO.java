@@ -1,5 +1,8 @@
 package com.interstellar.equipmentmanager.model.dto.team.in;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -12,10 +15,12 @@ import java.util.UUID;
 @Getter
 @Setter
 public class TeamCreateDTO {
-
+    @NotBlank(message = "Team name is mandatory")
     private String teamName;
 
-    private List<UUID> memberIds;
+    @NotNull(message = "Members ids are not allowed to be null")
+    private List<UUID> membersIds;
 
+    @NotNull(message = "Owner id is mandatory")
     private UUID ownerId;
 }

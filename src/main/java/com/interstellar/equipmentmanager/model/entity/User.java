@@ -1,6 +1,8 @@
 package com.interstellar.equipmentmanager.model.entity;
 
+import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
+import jakarta.validation.Constraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,26 +33,26 @@ public class User {
 
     @Column(name = "email")
     @NotNull
-//    @NotBlank
-//    @Email // this annotation is not correct regex for some users in AD
+    @NotBlank
+    @Email
     private String email;
 
     @Column(name = "first_name")
     @NotNull
     @NotBlank
-//    @AlphaString
+    @AlphaString
     private String firstName;
 
     @Column(name = "last_name")
     @NotNull
     @NotBlank
-//    @AlphaString
+    @AlphaString
     private String lastName;
 
     @Column(name = "full_name")
     @NotNull
     @NotBlank
-//    @AlphaString
+    @AlphaString
     private String fullName;
 
     @Lob

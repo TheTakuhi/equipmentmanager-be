@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +59,7 @@ public class LoanController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
-    public LoanDTO createLoan(@RequestBody LoanCreateDTO loanCreateDTO) {
+    public LoanDTO createLoan(@Valid @RequestBody LoanCreateDTO loanCreateDTO) {
         return loanService.createLoan(loanCreateDTO);
     }
 

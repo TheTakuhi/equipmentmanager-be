@@ -50,11 +50,6 @@ public class TeamMapperConfig {
                     em.map(TeamDTO::getMembers, Team::setMembers);
                 }
         );
-        mapper.typeMap(TeamCreateDTO.class, Team.class).addMappings(
-                em -> {
-                    em.map(TeamCreateDTO::getMemberIds, Team::setMembers);
-                }
-        );
         mapper.typeMap(TeamEditDTO.class, Team.class).addMappings(
                 em -> {
                     em.map(TeamEditDTO::getMembersIds, Team::setMembers);
