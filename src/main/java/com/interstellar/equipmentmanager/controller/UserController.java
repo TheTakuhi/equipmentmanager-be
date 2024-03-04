@@ -3,7 +3,6 @@ package com.interstellar.equipmentmanager.controller;
 import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
 import com.interstellar.equipmentmanager.model.dto.CustomPageDTO;
-import com.interstellar.equipmentmanager.model.dto.request.LdapUser;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
@@ -22,7 +21,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +36,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -189,8 +186,7 @@ public class UserController {
             @Valid @RequestBody UserEditDTO userEditDTO,
             @Parameter(description = "Keycloak flag for auto sync", schema = @Schema(implementation = Boolean.class, defaultValue = "false"))
             @RequestParam(defaultValue = "false") Boolean syncRolesToKeycloak) {
-        UserDTO user = userService.updateUser(id, userEditDTO, syncRolesToKeycloak);
-        return user;
+        return userService.updateUser(id, userEditDTO, syncRolesToKeycloak);
     }
 
     @Operation(summary = "Delete user from local database", responses = {
@@ -226,7 +222,7 @@ public class UserController {
     }, description = "ANYBODY can see available roles")
     @GetMapping("/roles")
     public List<UserRole> getAvailableRoles() {
-        return Arrays.stream(UserRole.values()).collect(Collectors.toList());
+        return Arrays.stream(UserRole.values()).toList();
     }
 
     @Operation(summary = "Sync missing users from LDAPQL",
@@ -235,7 +231,7 @@ public class UserController {
                     useReturnTypeSchema = true
             ), description = "Only ADMIN can sync users"
     )
-    @PostMapping("/sync")
+    @GetMapping("/sync")
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
     public void syncUsers() {
         userSyncService.syncAllUsersFromLdapQL();

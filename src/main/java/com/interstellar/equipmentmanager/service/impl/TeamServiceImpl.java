@@ -1,17 +1,13 @@
 package com.interstellar.equipmentmanager.service.impl;
 
-import com.interstellar.equipmentmanager.exception.ForbiddenAddException;
-import com.interstellar.equipmentmanager.exception.ForbiddenRemoveException;
+import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamEditDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamDTO;
-import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
-import com.interstellar.equipmentmanager.model.entity.Loan;
 import com.interstellar.equipmentmanager.model.entity.Team;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
-import com.interstellar.equipmentmanager.model.filter.LoanSpecifications;
 import com.interstellar.equipmentmanager.repository.TeamRepository;
 import com.interstellar.equipmentmanager.security.service.UserAuthorizationService;
 import com.interstellar.equipmentmanager.service.TeamService;
@@ -20,8 +16,6 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +63,7 @@ public class TeamServiceImpl implements TeamService {
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new ResourceNotFoundException(Team.class.getName(), "id", teamId.toString()));
         User user = userService.getOriginalUser(userId);
         if (team.getMembers().contains(user)) {
-            throw new ForbiddenAddException(userId.toString(), teamId.toString());
+            throw new ResourceConflictException(String.format("User with id %s cannot be add into team with id %s, because he/she is already member of the team.", userId, teamId));
         }
         team.getMembers().add(user);
         user.getTeams().add(team);
@@ -82,7 +76,7 @@ public class TeamServiceImpl implements TeamService {
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new ResourceNotFoundException(Team.class.getName(), "id", teamId.toString()));
         User user = userService.getOriginalUser(userId);
         if (!team.getMembers().contains(user)) {
-            throw new ForbiddenRemoveException(userId.toString(), teamId.toString());
+            throw new ResourceNotFoundException(String.format("User with id %s cannot be removed from team with id %s, because he/she is not member of the team.", userId, teamId));
         }
         team.getMembers().remove(user);
         user.getTeams().remove(team);
