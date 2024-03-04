@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,5 +32,5 @@ public class Manager {
     private String lastName;
 
     @OneToMany(mappedBy = "manager")
-    private List<User> managedUsers;
+    private List<User> managedUsers = new ArrayList<>();
 }

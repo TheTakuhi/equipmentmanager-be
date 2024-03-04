@@ -9,6 +9,7 @@ import com.interstellar.equipmentmanager.service.KeycloakService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -18,11 +19,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -83,6 +82,28 @@ public class KeycloakServiceImpl implements KeycloakService {
     }
 
     @Override
+    public Set<KeycloakUserDTO> getUsersByRoles(UserRole... userRoles) {
+        ClientRepresentation client = getClientRepresentation(frontendClient);
+        ClientResource clientResource = keycloak.realm(realm).clients().get(client.getId());
+
+        return Arrays.stream(userRoles)
+                .map(role -> clientResource.roles().get(role.name()).getUserMembers().stream()
+                        .map(userRepresentation -> {
+                            KeycloakUserDTO keycloakUserDTO = new KeycloakUserDTO();
+                            keycloakUserDTO.setLdapId(UUID.fromString(userRepresentation.firstAttribute("LDAP_ID")));
+
+                            List<UserRole> roles = representationToUserRoles(getUserRoles(userRepresentation, client.getClientId()));
+                            keycloakUserDTO.setUserRoles(roles);
+
+                            return keycloakUserDTO;
+                        })
+                        .collect(Collectors.toSet())
+                )
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
     public KeycloakUserDTO getUserByLdapId(@NonNull UUID ldapid, boolean fetchRoles) {
 
         UserRepresentation user = getUserRepresentation(ldapid);
@@ -117,6 +138,21 @@ public class KeycloakServiceImpl implements KeycloakService {
         return users.get(0);
     }
 
+    @Override
+    public boolean existsUserInKeycloak(UUID ldapId) {
+        String searchAttribute = String.format("LDAP_ID:%s", ldapId.toString());
+        List<UserRepresentation> users = keycloak.realm(realm)
+                .users()
+                .searchByAttributes(searchAttribute);
+
+        if (users.size() > 1) {
+            log.warn("More than one user with parameter are [{}] found.", searchAttribute);
+            throw new ResourceConflictException(String.format("More than one user with parameter are [%s] found.", searchAttribute));
+        }
+
+        return users.size() == 1;
+    }
+
     private ClientRepresentation getClientRepresentation(@NonNull String clientId) {
         List<ClientRepresentation> clients = keycloak.realm(realm).clients().findByClientId(clientId);
 
@@ -145,5 +181,12 @@ public class KeycloakServiceImpl implements KeycloakService {
             }
         }
         return userRoles;
+    }
+
+    @Override
+    public List<UserRole> getUserRolesByLdapId(UUID ldapId) {
+        UserRepresentation userRepresentation = getUserRepresentation(ldapId);
+        List<RoleRepresentation> roleRepresentations = getUserRoles(userRepresentation, frontendClient);
+        return representationToUserRoles(roleRepresentations);
     }
 }

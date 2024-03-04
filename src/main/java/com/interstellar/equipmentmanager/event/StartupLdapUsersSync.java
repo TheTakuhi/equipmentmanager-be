@@ -17,7 +17,7 @@ public class StartupLdapUsersSync {
 
     @Bean
     CommandLineRunner startupLdapUsersSyncCommandLineRunner() {
-        return _ -> {
+        return args -> {
             if (!isMockedDatabase.equals("always")) {
                 userSyncService.syncAllUsersFromLdapQL();
             }
