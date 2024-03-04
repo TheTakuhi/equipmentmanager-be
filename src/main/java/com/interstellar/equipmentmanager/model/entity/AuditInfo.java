@@ -1,9 +1,9 @@
 package com.interstellar.equipmentmanager.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.interstellar.equipmentmanager.model.enums.AuditActionType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.*;
 import org.springframework.data.annotation.*;
 
 import jakarta.persistence.Column;
@@ -25,8 +25,10 @@ public class AuditInfo {
     private Instant lastModifiedAt;
     @Column(name = "created_by")
     @CreatedBy
-    private String createdBy;
+    @Enumerated(EnumType.STRING)
+    private AuditActionType createdBy;
     @Column(name = "last_modified_by")
     @LastModifiedBy
-    private String lastModifiedBy;
+    @Enumerated(EnumType.STRING)
+    private AuditActionType lastModifiedBy;
 }

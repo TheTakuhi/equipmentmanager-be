@@ -1,6 +1,7 @@
 package com.interstellar.equipmentmanager.model.dto.audit;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.interstellar.equipmentmanager.model.enums.AuditActionType;
 import lombok.*;
 
 import java.time.Instant;
@@ -15,6 +16,6 @@ public class AuditDTO {
     private Instant createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private Instant lastModifiedAt;
-    private String createdBy;
-    private String lastModifiedBy;
+    private AuditActionType createdBy;
+    private AuditActionType lastModifiedBy;
 }

@@ -33,7 +33,6 @@ spring:
           autocommit: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    show-sql: true
     defer-datasource-initialization: true
   mvc:
     pathmatch:
@@ -60,7 +59,7 @@ keycloak-admin-cli:
   client-secret: Q1Wu0SpXMiQ8B3zDvNOcYQfac39PVAAK
 
 ldapQL:
-  base-url: http://10.14.41.118:10082
+  base-url: http://10.14.41.125:10082
   api-key: 9bd778b1-b6c9-427d-b1df-cce5f8e90047
 
 springdoc:
@@ -104,10 +103,3 @@ web:
 #  sender:
 #    name: EquipmentManager App
 #    email: equipmentmanager@tietoevry.com
-
-
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
