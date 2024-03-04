@@ -1,8 +1,7 @@
 package com.interstellar.equipmentmanager.model.entity;
 
-import com.interstellar.equipmentmanager.annotation.AlphaString;
+import com.interstellar.equipmentmanager.model.enums.AuditActionType;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
-import jakarta.validation.Constraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,31 +33,29 @@ public class User {
 
     @Column(name = "email")
     @NotNull
-    @NotBlank
-    @Email
     private String email;
 
     @Column(name = "first_name")
     @NotNull
     @NotBlank
-    @AlphaString
     private String firstName;
 
     @Column(name = "last_name")
     @NotNull
     @NotBlank
-    @AlphaString
     private String lastName;
 
     @Column(name = "full_name")
     @NotNull
     @NotBlank
-    @AlphaString
     private String fullName;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
     private String photo;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Manager manager;
 
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "user_role")
@@ -65,12 +63,6 @@ public class User {
     @Column(name = "\"role\"", nullable = false)
     @NotNull
     private List<UserRole> userRoles;
-
-    @OneToMany(mappedBy = "contractOwner", orphanRemoval = true)
-    private List<Contract> ownedContracts;
-
-    @OneToMany(mappedBy = "contractManager", orphanRemoval = true)
-    private List<Contract> managedContracts;
 
     @ManyToMany
     @JoinTable(
@@ -103,6 +95,15 @@ public class User {
                 String.format("%s %s",
                         firstName == null ? "x" : firstName,
                         lastName == null ? "x" : lastName)
+        );
+    }
+    @PreUpdate
+    void preUpdate() {
+        this.auditInfo = new AuditInfo(
+                this.getAuditInfo().getCreatedAt(),
+                Instant.now(),
+                this.getAuditInfo().getCreatedBy(),
+                AuditActionType.SYNC_SYSTEM
         );
     }
 }
