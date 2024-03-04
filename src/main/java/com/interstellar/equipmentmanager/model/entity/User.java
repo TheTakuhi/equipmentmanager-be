@@ -96,7 +96,14 @@ public class User {
                         firstName == null ? "x" : firstName,
                         lastName == null ? "x" : lastName)
         );
+        this.auditInfo = new AuditInfo(
+                Instant.now(),
+                Instant.now(),
+                AuditActionType.SYNC_SYSTEM,
+                AuditActionType.SYNC_SYSTEM
+        );
     }
+
     @PreUpdate
     void preUpdate() {
         this.auditInfo = new AuditInfo(
