@@ -65,7 +65,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         decode(authorizationHeader)
                 );
             } catch (JwtException e) {
-                throw new JwtException("Invalid JWT");
+                throw e;
             }
         }
         filterChain.doFilter(request, response);

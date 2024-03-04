@@ -1,6 +1,7 @@
 package com.interstellar.equipmentmanager.model.dto.user.out;
 
 import com.interstellar.equipmentmanager.model.dto.audit.AuditDTO;
+import com.interstellar.equipmentmanager.model.dto.contract.out.ContractCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.item.out.ItemCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.loan.out.LoanCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamCroppedDTO;
@@ -25,6 +26,7 @@ public class UserDTO {
     private String fullName;
     private String photo;
     private List<UserRole> userRoles;
+    private List<ContractCroppedDTO> ownedContracts;
     private AuditDTO auditInfo;
     private Boolean removed;
     private List<TeamCroppedDTO> teams;

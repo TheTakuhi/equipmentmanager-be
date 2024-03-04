@@ -34,7 +34,6 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class LoanServiceImpl implements LoanService {
-
     private final LoanRepository loanRepository;
     private final UserService userService;
     private final ItemService itemService;
@@ -79,7 +78,6 @@ public class LoanServiceImpl implements LoanService {
         return mapper.map(loan, LoanDTO.class);
     }
 
-
     public Loan getLoanById(UUID id) {
         Loan loan = loanRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Loan.class.getName(), "id", id.toString()));
         return loan;
@@ -93,13 +91,11 @@ public class LoanServiceImpl implements LoanService {
         return mapper.map(loanRepository.save(loan), LoanDTO.class);
     }
 
-
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public Page<LoanDTO> getAllLoans(@Nullable LoanFilter filter, @Nullable Pageable pageable) {
         if (pageable == null) pageable = Pageable.ofSize(Integer.MAX_VALUE);
         if (filter == null) filter = new LoanFilter();
-
 
         Specification<Loan> spec = LoanSpecifications.filterLoans(
                 filter.getSerialCode() == null ? null : String.format("%%%s%%", filter.getSerialCode()),
@@ -112,6 +108,4 @@ public class LoanServiceImpl implements LoanService {
         var loans = loanRepository.findAll(spec, pageable);
         return loans.map(l -> mapper.map(l, LoanDTO.class));
     }
-
-
 }

@@ -149,6 +149,7 @@ public class TeamController {
     @GetMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public Page<TeamDTO> getAllTeams(@PageableDefault(size = 20) Pageable pageable) {
+
         return teamService.getAllTeams(pageable);
     }
 

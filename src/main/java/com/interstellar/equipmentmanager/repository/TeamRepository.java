@@ -14,9 +14,6 @@ import java.util.UUID;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, UUID>, JpaSpecificationExecutor<Team> {
-
     Page<Team> findAll(Pageable pageable);
-
     Page<Team> findByMembersId(UUID id, Pageable pageable);
-
 }

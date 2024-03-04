@@ -1,7 +1,5 @@
 package com.interstellar.equipmentmanager.model.dto.loan.out;
 
-import com.interstellar.equipmentmanager.model.dto.item.out.ItemCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import lombok.*;
 
 import java.util.UUID;
@@ -13,7 +11,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class LoanCroppedDTO {
-
     private UUID id;
     private UUID itemId;
     private UUID lenderId;
