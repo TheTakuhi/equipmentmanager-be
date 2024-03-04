@@ -1,6 +1,5 @@
 package com.interstellar.equipmentmanager.service.impl;
 
-import com.interstellar.equipmentmanager.exception.KeycloakUserNotFoundException;
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
@@ -16,9 +15,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,50 +35,6 @@ public class KeycloakServiceImpl implements KeycloakService {
     @Value("${keycloak.resource}")
     private String frontendClient;
 
-    /**
-     * Searches all keycloak users by username
-     *
-     * @param username
-     * @return list of users Important: method does not fetch users roles
-     */
-    @Override
-    public List<KeycloakUserDTO> findAllUsers(@Nullable String username, @Nullable Pageable pageable) {
-        if (pageable == null) pageable = Pageable.ofSize(Integer.MAX_VALUE);
-
-        return keycloak.realm(realm).users()
-                .search(username, null, null, null,
-                        pageable.getPageSize(),
-                        pageable.getPageSize(), true, false, false)
-                .stream()
-                .map(ur -> mapper.map(ur, KeycloakUserDTO.class))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public KeycloakUserDTO getUserByPersonalNumber(@NonNull String personalNumber, boolean fetchRoles) {
-        var user = getUserRepresentation(String.format("employeeId:%s", personalNumber));
-        var keycloakUser = mapper.map(user, KeycloakUserDTO.class);
-
-        if (fetchRoles) {
-            var roles = getUserRoles(user, frontendClient);
-            keycloakUser.setUserRoles(representationToUserRoles(roles));
-        }
-
-        return keycloakUser;
-    }
-
-    @Override
-    public KeycloakUserDTO getUserByEmail(@NonNull String email, boolean fetchRoles) {
-        var user = getUserRepresentation(String.format("email:%s", email));
-        var keycloakUser = mapper.map(user, KeycloakUserDTO.class);
-
-        if (fetchRoles) {
-            var roles = getUserRoles(user, frontendClient);
-            keycloakUser.setUserRoles(representationToUserRoles(roles));
-        }
-
-        return keycloakUser;
-    }
 
     /**
      * Updates LDAP user role (application supports only one role).
@@ -130,7 +83,7 @@ public class KeycloakServiceImpl implements KeycloakService {
     }
 
     @Override
-    public KeycloakUserDTO getUserByLdapId(@NonNull UUID ldapid, boolean fetchRoles) throws KeycloakUserNotFoundException {
+    public KeycloakUserDTO getUserByLdapId(@NonNull UUID ldapid, boolean fetchRoles) {
 
         UserRepresentation user = getUserRepresentation(ldapid);
         KeycloakUserDTO keycloakUser = mapper.map(user, KeycloakUserDTO.class);

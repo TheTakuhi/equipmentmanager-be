@@ -1,12 +1,10 @@
 package com.interstellar.equipmentmanager.controller;
 
-import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;
 import com.interstellar.equipmentmanager.service.KeycloakService;
 import com.interstellar.equipmentmanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -14,13 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,33 +27,6 @@ import java.util.UUID;
 public class KeycloakController {
     private final KeycloakService keycloakService;
     private final UserService userService;
-
-    @Operation(summary = "Find users from keycloak by username/login", responses = {
-            @ApiResponse(
-                    description = "Found users successful",
-                    responseCode = "200",
-                    useReturnTypeSchema = true
-            ),
-            @ApiResponse(
-                    description = "User is not logged in",
-                    responseCode = "401",
-                    content = @Content
-            ),
-            @ApiResponse(
-                    description = "User is not authorized to do this",
-                    responseCode = "403",
-                    content = @Content
-            )
-    }, description = "Only MANAGER and ADMIN can do this (this operation takes a long time)")
-    @GetMapping("/search")
-    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
-    public List<KeycloakUserDTO> findUsersFromKeycloak(
-            @Parameter(name = "login", description = "Login to search by.", required = true)
-            @RequestParam(name = "login") @Valid @NotNull @AlphaString String username,
-            @PageableDefault(size = 20) Pageable pageable
-    ) {
-        return keycloakService.findAllUsers(username, pageable);
-    }
 
     @Operation(summary = "Get user by his ldapId from keycloak with roles", responses = {
             @ApiResponse(

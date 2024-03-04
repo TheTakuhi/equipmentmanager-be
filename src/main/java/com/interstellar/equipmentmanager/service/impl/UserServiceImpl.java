@@ -136,7 +136,7 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(@NonNull UUID id) {
         var user = getOriginalUser(id);
         if(user.getTeams().size() > 0){
-            throw new ForbiddenActionException(String.format("User with id %s cannot be removed because he/she is owner of number of teams (%s).", user.getId().toString(), String.valueOf(user.getTeams().size())));
+            throw new ResourceConflictException(String.format("User with id %s cannot be removed because he/she is owner of number of teams (%s).", user.getId().toString(), user.getTeams().size()));
         }
         user.setRemoved(true);
         userRepository.save(user);
