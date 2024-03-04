@@ -14,11 +14,9 @@ public enum Type {
     KEYBOARD,
     HEADPHONES,
     OTHER;
-
     public static List<String> asStringList() {
         return Arrays.stream(Type.values())
                 .map(Enum::name)
                 .collect(Collectors.toList());
     }
-
 }

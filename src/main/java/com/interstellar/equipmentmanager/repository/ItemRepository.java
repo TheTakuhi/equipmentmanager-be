@@ -22,6 +22,4 @@ public interface ItemRepository extends JpaRepository<Item, UUID>, JpaSpecificat
 
     @Query("SELECT i FROM Item i WHERE i.owner.id = :ownerId AND i.state != 'DISCARDED'")
     List<Item> findAllByOwnerIdAndNotDiscarded(@NonNull @Param("ownerId") UUID id);
-
-
 }

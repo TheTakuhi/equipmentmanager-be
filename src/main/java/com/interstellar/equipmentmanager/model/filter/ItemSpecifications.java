@@ -33,7 +33,7 @@ public class ItemSpecifications {
                 predicates.add(builder.equal(root.get("qualityState"), qualityState));
             }
 
-            if (!includeDiscarded) {
+            if (includeDiscarded == null || !includeDiscarded) {
                 Predicate notDiscardedPredicate = builder.notEqual(root.get("state"), State.DISCARDED);
                 predicates.add(notDiscardedPredicate);
             }
