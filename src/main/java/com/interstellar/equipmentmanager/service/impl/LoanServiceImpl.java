@@ -53,6 +53,7 @@ public class LoanServiceImpl implements LoanService {
 
 
             if (item.getState().equals(State.AVAILABLE)) {
+                item.setState(State.BORROWED);
                 loan.setItem(item);
             } else {
                 throw new ResourceConflictException(String.format("Item with id %s cannot be lend because it is already %s ", item.getId().toString(), item.getState()));
