@@ -50,7 +50,7 @@ public class ItemMapperConfig {
         mapper.typeMap(Item.class, ItemCroppedDTO.class).addMappings(
                 em -> {
                     em.map(Item::getOwner, ItemCroppedDTO::setOwnerId);
-                    em.map(Item::getLoans, ItemCroppedDTO::setLoansId);
+                    em.map(Item::getLoans, ItemCroppedDTO::setLoansIds);
                 }
         );
         mapper.typeMap(ItemEditDTO.class, Item.class).addMappings(

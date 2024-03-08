@@ -32,5 +32,5 @@ public class ItemCroppedDTO {
 
     private UUID ownerId;
 
-    private List<UUID> loansId;
+    private List<UUID> loansIds;
 }
