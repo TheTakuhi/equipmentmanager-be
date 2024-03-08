@@ -57,9 +57,9 @@ public class LoanMapperConfig {
         );
         mapper.typeMap(Loan.class, LoanDTO.class).addMappings(
                 em -> {
-                    em.map(Loan::getBorrower, LoanDTO::setBorrowerCroppedDTO);
-                    em.map(Loan::getLender, LoanDTO::setLenderCroppedDTO);
-                    em.map(Loan::getItem, LoanDTO::setItemCroppedDTO);
+                    em.map(Loan::getBorrower, LoanDTO::setBorrower);
+                    em.map(Loan::getLender, LoanDTO::setLender);
+                    em.map(Loan::getItem, LoanDTO::setItem);
                 }
         );
         mapper.typeMap(Loan.class, LoanCroppedDTO.class).addMappings(

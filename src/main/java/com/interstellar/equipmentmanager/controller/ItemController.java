@@ -60,7 +60,7 @@ public class ItemController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
-    public ItemDTO createItem(@RequestBody ItemCreateDTO itemCreateDTO) {
+    public ItemDTO createItem(@Valid @RequestBody ItemCreateDTO itemCreateDTO) {
         return itemService.createItem(itemCreateDTO);
     }
 

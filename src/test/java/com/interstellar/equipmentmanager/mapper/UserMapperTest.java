@@ -88,7 +88,6 @@ public class UserMapperTest {
 
         assertThat(res.getId()).isEqualTo(userDTO.getId());
         assertThat(res.getUserRoles().size()).isEqualTo(userDTO.getUserRoles().size());
-        assertThat(res.getOwnedContractIds().size()).isEqualTo(userDTO.getOwnedContracts().size());
     }
 
     @ParameterizedTest

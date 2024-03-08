@@ -27,7 +27,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
     private final UserService userService;
-    public boolean verifyToken(String token){
+    
+    public boolean verifyToken(String token) {
         return token != null && token.startsWith("Bearer ");
     }
 
@@ -43,8 +44,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         ));
         return roles;
     }
-
-    public Map<String, Object> decode(String token){
+    
+    public Map<String, Object> decode(String token) {
         if (verifyToken(token)) {
             String jwkSetUri = "https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/certs";
             String jwt_only = token.substring(7);
@@ -59,22 +60,22 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer")){
-            try{
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
+            try {
                 handleUserFromToken(
                         decode(authorizationHeader)
                 );
             } catch (JwtException e) {
-                throw e;
+                throw new JwtException("Invalid JWT");
             }
         }
         filterChain.doFilter(request, response);
     }
-
-    private void handleUserFromToken(Map<String, Object> claims){
-        try{
+    
+    private void handleUserFromToken(Map<String, Object> claims) {
+        try {
             userService.getUserBylogin(claims.get("preferred_username").toString());
-        } catch (NotFoundException e){
+        } catch (NotFoundException e) {
             UserCreateDTO userCreateDTO = new UserCreateDTO();
             userCreateDTO.setId(UUID.fromString(claims.get("LDAP_ID").toString()));
             userCreateDTO.setLogin(claims.get("preferred_username").toString());
