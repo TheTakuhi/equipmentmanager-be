@@ -1,6 +1,5 @@
 package com.interstellar.equipmentmanager.config.mapper;
 
-import com.interstellar.equipmentmanager.model.dto.contract.out.ContractCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
@@ -52,16 +51,6 @@ public class UserMapperConfig {
         if (ctx.getSource() == null)
             return null;
         return ctx.getSource().getId();
-    };
-
-    private final Converter<List<ContractCroppedDTO>, List<UUID>> contractCroppedDTOToId = ctx -> {
-        if (ctx.getSource() == null)
-            return null;
-        List<UUID> ids = new ArrayList<>();
-        for (ContractCroppedDTO contractCroppedDTO : ctx.getSource()) {
-            ids.add(contractCroppedDTO.getId());
-        }
-        return ids;
     };
 
     private final Converter<List<TeamCroppedDTO>, List<UUID>> teamCroppedDTOToId = ctx -> {
