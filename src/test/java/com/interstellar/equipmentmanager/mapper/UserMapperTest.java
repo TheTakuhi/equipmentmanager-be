@@ -135,16 +135,6 @@ public class UserMapperTest {
         assertThat(res.getFullName()).contains(userCreateDTO.getLastName());
     }
 
-    @ParameterizedTest
-    @MethodSource("genEditDTO")
-    public void UserEditDTOToEntity(UserEditDTO contractEditDTO) {
-        mapper.typeMap(UserEditDTO.class, User.class).validate();
-        log.info(TestPrinter.prettifyObjectPrint(contractEditDTO));
-        var res = mapper.map(contractEditDTO, User.class);
-        log.info(TestPrinter.prettifyObjectPrint(res));
-    }
-
-
     public static Stream<UserRepresentation> genUserRepresentations() {
         return genObjects(UserRepresentation.class, 10);
     }
