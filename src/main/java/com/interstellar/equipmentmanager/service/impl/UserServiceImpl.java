@@ -141,7 +141,4 @@ public class UserServiceImpl implements UserService {
         user.setRemoved(true);
         userRepository.save(user);
     }
-
-    //todo getAllMyPeople
-
 }
