@@ -21,15 +21,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 
@@ -153,10 +149,15 @@ public class UserServiceUnitTest {
         List<User> filteredUsers = Collections.singletonList(new User());
         Page<User> page = new PageImpl<>(filteredUsers);
 
-        when(userRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
+        when(userRepository.findAll(
+                eq("%" + filter.getLogin() + "%"),
+                eq("%" + filter.getFullName() + "%"),
+                eq(filter.getUserRoles()),
+                eq(filter.getIncludeRemovedUser()),
+                any()))
+                .thenReturn(page);
 
         Page<UserCroppedDTO> result = userService.getAllUsers(filter, null);
-
         Assertions.assertEquals(filteredUsers.size(), result.getContent().size());
     }
 
@@ -165,6 +166,7 @@ public class UserServiceUnitTest {
         UUID userId = UUID.randomUUID();
         User originalUser = new User();
         originalUser.setId(userId);
+        originalUser.setTeams(new ArrayList<>());
 
         when(userRepository.findById(eq(userId))).thenReturn(Optional.of(originalUser));
 

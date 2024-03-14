@@ -26,7 +26,6 @@ public class TestFakeGeneratorProvider {
             .set(Keys.MAX_DEPTH, 4);
 
     public static <T> InstancioApi<T> getFakeModelGenerator(Class<T> clazz, Long seed) {
-
         var faker = new Faker(new Random(seed));
         return Instancio.of(clazz)
                 .withSettings(settings)

@@ -73,12 +73,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Boolean isOwner(UUID id) {
-
         if (getItemById(id).getOwner().getId().equals(userAuthorizationService.getCurrentUser().getId())) {
             return true;
         } else return false;
     }
-
 
     @Override
     public ItemDTO getItemDTOById(UUID id) {

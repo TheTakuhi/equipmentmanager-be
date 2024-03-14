@@ -6,11 +6,13 @@ import com.interstellar.equipmentmanager.model.dto.item.in.ItemCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.item.in.ItemEditDTO;
 import com.interstellar.equipmentmanager.model.dto.item.out.ItemDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.model.entity.Item;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.enums.QualityState;
 import com.interstellar.equipmentmanager.model.enums.State;
 import com.interstellar.equipmentmanager.model.enums.Type;
+import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.model.filter.ItemFilter;
 import com.interstellar.equipmentmanager.repository.ItemRepository;
 import com.interstellar.equipmentmanager.security.service.UserAuthorizationService;
@@ -31,8 +33,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.*;
 
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -61,26 +62,25 @@ public class ItemServiceUnitTest {
     @Test
     void createItem() {
         ItemCreateDTO itemCreateDTO = new ItemCreateDTO();
+        UserCroppedDTO currentUserCropped = new UserCroppedDTO();
 
-        UserCroppedDTO currentUser = new UserCroppedDTO();
-        User user = new User();
-        ItemDTO itemDTO = new ItemDTO();
+        UserDTO currentUserDTO = new UserDTO();
+        currentUserDTO.setId(currentUserCropped.getId());
 
-        when(userAuthorizationService.getCurrentUser());
+        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUserDTO);
+        when(mapper.map(itemCreateDTO, Item.class)).thenReturn(new Item());
+        when(mapper.map(currentUserCropped, User.class)).thenReturn(new User());
 
-        Item item = new Item();
-
-        when(mapper.map(itemCreateDTO, Item.class)).thenReturn(item);
-        when(mapper.map(currentUser, User.class)).thenReturn(user);
         when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> {
             Item savedItem = invocation.getArgument(0);
             savedItem.setId(UUID.randomUUID());
             return savedItem;
         });
+
+        ItemDTO itemDTO = new ItemDTO();
         when(mapper.map(any(Item.class), eq(ItemDTO.class))).thenReturn(itemDTO);
 
         ItemDTO result = itemService.createItem(itemCreateDTO);
-
         assertNotNull(result);
     }
 
@@ -106,52 +106,41 @@ public class ItemServiceUnitTest {
     @Test
     void isOwner_itemBelongsToCurrentUser_shouldReturnTrue() {
         UUID itemId = UUID.randomUUID();
-        UserCroppedDTO currentUser = new UserCroppedDTO();
-        currentUser.setId(UUID.randomUUID());
+        UserDTO currentUserDTO = new UserDTO();
+        currentUserDTO.setId(UUID.randomUUID());
 
-        Mockito.doReturn(currentUser)
-                .when(userAuthorizationService)
-                .getCurrentUser(Mockito.any());
+        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUserDTO);
 
-        ItemDTO itemDTO = new ItemDTO();
-        itemDTO.setOwner(currentUser);
+        User owner = new User();
+        owner.setId(currentUserDTO.getId());
+
         Item item = new Item();
         item.setId(itemId);
+        item.setOwner(owner);
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(mapper.map(item, ItemDTO.class)).thenReturn(itemDTO);
-        when(userAuthorizationService.getCurrentUser());
-
         boolean result = itemService.isOwner(itemId);
-
-        Assertions.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
     void isOwner_itemDoesNotBelongToCurrentUser_shouldReturnFalse() {
         UUID itemId = UUID.randomUUID();
-        UserCroppedDTO currentUser = new UserCroppedDTO();
-        currentUser.setId(UUID.randomUUID());
+        UserDTO currentUserDTO = new UserDTO();
+        currentUserDTO.setId(UUID.randomUUID());
 
-        Mockito.doReturn(currentUser)
-                .when(userAuthorizationService)
-                .getCurrentUser(Mockito.any());
-
-        UserCroppedDTO owner = new UserCroppedDTO();
+        User owner = new User();
         owner.setId(UUID.randomUUID());
 
-        ItemDTO itemDTO = new ItemDTO();
-        itemDTO.setOwner(owner);
+        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUserDTO);
+
         Item item = new Item();
         item.setId(itemId);
+        item.setOwner(owner);
 
         when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-        when(mapper.map(item, ItemDTO.class)).thenReturn(itemDTO);
-        when(userAuthorizationService.getCurrentUser());
-
         boolean result = itemService.isOwner(itemId);
-
-        Assertions.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -196,6 +185,11 @@ public class ItemServiceUnitTest {
 
         List<Item> filteredItems = Collections.singletonList(new Item());
         Page<Item> page = new PageImpl<>(filteredItems);
+
+        UserDTO currentUserDTO = new UserDTO();
+        currentUserDTO.setUserRoles(Arrays.asList(UserRole.ADMIN));
+        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUserDTO);
+
         when(itemRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
         Page<ItemDTO> result = itemService.getAllItems(filter, null);
@@ -207,6 +201,11 @@ public class ItemServiceUnitTest {
     void getAllItems_withoutFilter_shouldReturnAllItems() {
         List<Item> allItems = Arrays.asList(new Item(), new Item(), new Item());
         Page<Item> page = new PageImpl<>(allItems);
+
+        UserDTO currentUserDTO = new UserDTO();
+        currentUserDTO.setUserRoles(Arrays.asList(UserRole.ADMIN));
+        when(userAuthorizationService.getCurrentUser()).thenReturn(currentUserDTO);
+
         when(itemRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(page);
 
         Page<ItemDTO> result = itemService.getAllItems(null, null);
@@ -214,3 +213,5 @@ public class ItemServiceUnitTest {
         Assertions.assertEquals(allItems.size(), result.getContent().size());
     }
 }
+
+
