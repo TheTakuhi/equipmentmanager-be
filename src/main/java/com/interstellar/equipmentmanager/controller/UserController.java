@@ -7,10 +7,12 @@ import com.interstellar.equipmentmanager.model.dto.user.in.UserCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.model.dto.user.in.UserEditDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserHierarchyDTO;
 import com.interstellar.equipmentmanager.model.entity.User;
 import com.interstellar.equipmentmanager.model.enums.UserRole;
 import com.interstellar.equipmentmanager.model.filter.UserFilter;
 import com.interstellar.equipmentmanager.security.service.UserAuthorizationService;
+import com.interstellar.equipmentmanager.service.ReactiveLdapQLService;
 import com.interstellar.equipmentmanager.service.UserService;
 import com.interstellar.equipmentmanager.service.UserSyncService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,8 +50,8 @@ public class UserController {
     private final UserService userService;
     private final UserSyncService userSyncService;
     private final UserAuthorizationService userAuthorizationService;
-//    private final MailService mailService;
-
+    private final ReactiveLdapQLService reactiveLdapQLService;
+    
     @Operation(summary = "Create new user", responses = {
             @ApiResponse(
                     description = "Create users successful",
@@ -71,9 +73,7 @@ public class UserController {
     @PostMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
     public UserDTO createUser(@Valid @RequestBody UserCreateDTO userCreateDTO) {
-        UserDTO user = userService.createUser(userCreateDTO);
-//        mailService.sendUserCreateMail(userCreateDTO);
-        return user;
+        return userService.createUser(userCreateDTO);
     }
 
     @Operation(summary = "Get current user from security token ldap id", responses = {
@@ -235,5 +235,18 @@ public class UserController {
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('ADMIN')")
     public void syncUsers() {
         userSyncService.syncAllUsersFromLdapQL();
+    }
+    
+    
+    @Operation(summary = "Get user hierarchy",
+            responses = @ApiResponse(
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            )
+    )
+    @GetMapping("/{id}/hierarchy")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
+    public UserHierarchyDTO getUserHierarchy(@PathVariable UUID id) {
+        return reactiveLdapQLService.getHierarchyOfUser(id).block();
     }
 }
