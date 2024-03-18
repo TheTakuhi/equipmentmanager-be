@@ -162,16 +162,16 @@ public class UserMapperConfig {
 
         mapper.typeMap(LdapUser.class, UserEditDTO.class)
                 .addMappings(em -> {
-                    em.map(LdapUser::getObjectGUID, UserEditDTO::setId);
+                    em.map(LdapUser::getId, UserEditDTO::setId);
                     em.map(LdapUser::getLogin, UserEditDTO::setLogin);
                     em.skip(UserEditDTO::setUserRoles);
                 });
         mapper.typeMap(LdapUser.class, User.class)
                 .addMappings(em -> {
-                    em.map(LdapUser::getObjectGUID, User::setId);
+                    em.map(LdapUser::getId, User::setId);
                     em.map(LdapUser::getLogin, User::setLogin);
-                    em.map(LdapUser::getLastname, User::setLastName);
-                    em.map(LdapUser::getFirstname, User::setFirstName);
+                    em.map(LdapUser::getLastName, User::setLastName);
+                    em.map(LdapUser::getFirstName, User::setFirstName);
                     em.map(LdapUser::getEmail, User::setEmail);
                     em.skip(User::setUserRoles);
                 });

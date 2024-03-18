@@ -6,10 +6,10 @@ import java.util.UUID;
 
 @Data
 public class LdapUser {
-    private UUID objectGUID;
+    private UUID id;
     private String email;
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
     private String login;
     private LdapUser manager;
 }

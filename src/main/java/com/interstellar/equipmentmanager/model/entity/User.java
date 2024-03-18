@@ -54,7 +54,7 @@ public class User {
     @Basic(fetch = FetchType.LAZY)
     private String photo;
     
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Manager manager;
     
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.LAZY)
