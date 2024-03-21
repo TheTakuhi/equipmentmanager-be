@@ -1,0 +1,28 @@
+version: '3.3'
+
+volumes:
+  postgres_data:
+    driver: local
+
+services:
+  equipment-manager-db:
+    image: postgres:15.3
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5439:5432"
+    environment:
+      POSTGRES_DB: equipment-manager-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+  equipment-manager-api:
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - equipment-manager-db
+    restart: on-failure
+    tty: true
+    stdin_open: true

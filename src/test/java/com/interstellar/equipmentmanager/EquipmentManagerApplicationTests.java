@@ -1,13 +1,11 @@
-package com.interstellar.Interstellar;
+package com.interstellar.equipmentmanager;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class InterstellarApplicationTests {
-
+class EquipmentManagerApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
