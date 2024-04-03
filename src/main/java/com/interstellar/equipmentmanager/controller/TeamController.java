@@ -1,12 +1,16 @@
 package com.interstellar.equipmentmanager.controller;
 
+import com.interstellar.equipmentmanager.model.dto.CustomPageDTO;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamEditDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamDTO;
-import com.interstellar.equipmentmanager.security.service.impl.UserAuthorizationServiceImpl;
+import com.interstellar.equipmentmanager.model.dto.team.out.TeamMembersSizeDTO;
+import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,9 +35,9 @@ import java.util.UUID;
 @Validated
 @Slf4j
 public class TeamController {
-
+    
     private final TeamService teamService;
-
+    
     @Operation(summary = "Create new team", responses = {
             @ApiResponse(
                     description = "Create teams successful",
@@ -57,7 +61,7 @@ public class TeamController {
     public TeamDTO createTeam(@Valid @RequestBody TeamCreateDTO teamCreateDTO) {
         return teamService.createTeam(teamCreateDTO);
     }
-
+    
     @Operation(summary = "Update team", responses = {
             @ApiResponse(
                     description = "Update of team is successful",
@@ -82,7 +86,7 @@ public class TeamController {
             @Valid @RequestBody TeamEditDTO teamEditDTO) {
         return teamService.updateTeam(id, teamEditDTO);
     }
-
+    
     @Operation(summary = "Add user to team", responses = {
             @ApiResponse(
                     description = "Adding user to team is successful",
@@ -107,7 +111,7 @@ public class TeamController {
             @PathVariable("userId") UUID userId) {
         return teamService.addUserToTeam(teamId, userId);
     }
-
+    
     @Operation(summary = "Remove user from team", responses = {
             @ApiResponse(
                     description = "The removal of user from team was successful",
@@ -132,8 +136,8 @@ public class TeamController {
             @PathVariable("userId") UUID userId) {
         return teamService.removeUserFromTeam(teamId, userId);
     }
-
-
+    
+    
     @Operation(summary = "Get all teams", responses = {
             @ApiResponse(
                     description = "Get teams successful",
@@ -149,11 +153,10 @@ public class TeamController {
     @GetMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public Page<TeamDTO> getAllTeams(@PageableDefault(size = 20) Pageable pageable) {
-
         return teamService.getAllTeams(pageable);
     }
-
-
+    
+    
     @Operation(summary = "Get team by its uuid", responses = {
             @ApiResponse(
                     description = "Get team successful",
@@ -173,10 +176,10 @@ public class TeamController {
     }, description = "Get team by its id")
     @GetMapping("/{id}")
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER') ")
-    public TeamDTO getTeam(@PathVariable UUID id) {
-        return teamService.getTeamById(id);
+    public TeamMembersSizeDTO getTeam(@PathVariable UUID id) {
+        return teamService.findTeamById(id);
     }
-
+    
     @Operation(summary = "Delete team from local database", responses = {
             @ApiResponse(
                     description = "Delete of team is successful",
@@ -199,5 +202,43 @@ public class TeamController {
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
     public void deleteTeam(@PathVariable UUID id) {
         teamService.deleteTeamById(id);
+    }
+    
+    
+    
+    @Operation(summary = "Get members with search", responses = {
+            @ApiResponse(
+                    description = "Get members successful",
+                    responseCode = "200",
+                    useReturnTypeSchema = true
+            ),
+            @ApiResponse(
+                    description = "Team not found",
+                    responseCode = "404",
+                    useReturnTypeSchema = true
+            ),
+            @ApiResponse(
+                    description = "User is not authorized to do this operation",
+                    responseCode = "403",
+                    content = @Content
+            )
+    }, description = "Only ADMIN and MANAGER can see all team members")
+    @GetMapping("/{id}/members")
+    @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
+    public CustomPageDTO<UserDTO> getTeamMembers(
+            @PathVariable UUID id,
+            @Parameter(name = "search", schema = @Schema(implementation = String.class))
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 20) Pageable pageable) {
+        Page<UserDTO> standardPage = teamService.findFilteredTeamMembersById(id, search, pageable);
+        return new CustomPageDTO<>(
+                standardPage.getTotalElements(),
+                standardPage.getTotalPages(),
+                standardPage.getContent().size(),
+                standardPage.getContent(),
+                pageable,
+                standardPage.getTotalPages() > pageable.getPageNumber() + 1,
+                pageable.getPageNumber() > 0
+        );
     }
 }

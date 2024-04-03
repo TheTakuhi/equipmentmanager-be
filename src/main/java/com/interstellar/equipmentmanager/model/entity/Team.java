@@ -9,6 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,20 +21,20 @@ import java.util.UUID;
 @Table(name = "teams")
 @EntityListeners(AuditingEntityListener.class)
 public class Team {
-
+    
     @Id
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "uuid2")
     @Column(name = "team_id", length = 36, updatable = false, nullable = false)
     private UUID id;
-
+    
     @Column(unique = true)
     private String teamName;
-
+    
     @ManyToOne(optional = false)
     private User owner;
-
+    
     @ManyToMany(mappedBy = "teams")
-    private List<User> members;
-
+    private List<User> members = new ArrayList<>();
+    
 }
