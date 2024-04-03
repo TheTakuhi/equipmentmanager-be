@@ -1,29 +1,29 @@
 package com.interstellar.equipmentmanager.config.mapper;
 
-import com.interstellar.equipmentmanager.model.dto.team.in.TeamCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamEditDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamCroppedDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamDTO;
-import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
-import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
+import com.interstellar.equipmentmanager.model.dto.team.out.TeamMembersSizeDTO;
 import com.interstellar.equipmentmanager.model.entity.Team;
 
+import com.interstellar.equipmentmanager.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.UUID;
 
 @Configuration
 @RequiredArgsConstructor
 public class TeamMapperConfig {
-
+    
     private final ModelMapper mapper;
-
+    
     private final Converter<Team, UUID> teamToId = ctx -> ctx.getSource() == null ? null : ctx.getSource().getId();
-
+    
     private final Converter<UUID, Team> idToTeam = ctx -> {
         if (ctx.getSource() == null) {
             return null;
@@ -32,8 +32,15 @@ public class TeamMapperConfig {
         team.setId(ctx.getSource());
         return team;
     };
-
-
+    
+    private final Converter<List<User>, Integer> membersIdMap = ctx -> {
+        if (ctx.getSource() == null) {
+            return 0;
+        }
+        return ctx.getSource().size();
+    };
+    
+    
     @Bean
     public void TeamConverting() {
         mapper.typeMap(Team.class, UUID.class).setConverter(teamToId);
@@ -42,6 +49,12 @@ public class TeamMapperConfig {
                 em -> {
                     em.map(Team::getOwner, TeamDTO::setOwner);
                     em.map(Team::getMembers, TeamDTO::setMembers);
+                }
+        );
+        mapper.typeMap(Team.class, TeamMembersSizeDTO.class).addMappings(
+                em -> {
+                    em.map(Team::getOwner, TeamMembersSizeDTO::setOwner);
+                    em.using(membersIdMap).map(Team::getMembers, TeamMembersSizeDTO::setMembersSize);
                 }
         );
         mapper.typeMap(TeamDTO.class, Team.class).addMappings(
@@ -62,7 +75,7 @@ public class TeamMapperConfig {
                     em.map(Team::getOwner, TeamCroppedDTO::setOwnerId);
                 }
         );
-
+        
     }
-
+    
 }

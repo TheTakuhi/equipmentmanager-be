@@ -3,22 +3,14 @@ package com.interstellar.equipmentmanager.model.dto.team.out;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserCroppedDTO;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-@Getter
-@Setter
-public class TeamDTO {
-    
+public class TeamMembersSizeDTO {
     private UUID id;
-    
     private String teamName;
-    
     private UserCroppedDTO owner;
-    
-    private List<UserCroppedDTO> members = new ArrayList<>();
+    private int membersSize;
 }
