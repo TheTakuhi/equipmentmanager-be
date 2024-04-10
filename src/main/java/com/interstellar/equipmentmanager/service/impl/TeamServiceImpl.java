@@ -30,30 +30,39 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Service
 public class TeamServiceImpl implements TeamService {
-    
     private final TeamRepository teamRepository;
     private final ModelMapper mapper;
     private final UserAuthorizationService userAuthorizationService;
     private final UserService userService;
-    
-    
+
     @Override
     public TeamDTO createTeam(TeamCreateDTO teamCreateDTO) {
         Team team = mapper.map(teamCreateDTO, Team.class);
+
+        if (teamRepository.existsByTeamName(team.getTeamName())) {
+            throw new ResourceConflictException("Team already exists with name: [%s]".formatted(team.getTeamName()));
+        }
+
         team.setOwner(mapper.map(userAuthorizationService.getCurrentUser(), User.class));
         team.setMembers(team.getMembers().stream().map(x -> userService.getOriginalUser(x.getId())).collect(Collectors.toList()));
         team.getMembers().forEach(x -> x.getTeams().add(team));
         return mapper.map(teamRepository.save(team), TeamDTO.class);
     }
-    
+
     @Override
     public TeamDTO updateTeam(UUID id, TeamEditDTO teamEditDTO) {
         Team team = teamRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Team.class.getName(), "id", id.toString()));
+
+        if (teamRepository.existsByTeamName(team.getTeamName())) {
+            throw new ResourceConflictException("Team already exists with name: [%s]".formatted(team.getTeamName()));
+        }
+
         Team newTeam = mapper.map(teamEditDTO, Team.class);
         team.getMembers().forEach(member -> member.getTeams().remove(team));
         team.getMembers().clear();
         team.getMembers().addAll(newTeam.getMembers().stream().map(x -> userService.getOriginalUser(x.getId())).collect(Collectors.toList()));
         team.getMembers().forEach(member -> member.getTeams().add(team));
+
         if (newTeam.getOwner() != null) {
             User user = userService.getOriginalUser(newTeam.getOwner().getId());
             team.setOwner(user);
@@ -98,16 +107,23 @@ public class TeamServiceImpl implements TeamService {
         Team team = getTeamById(id);
         return mapper.map(team, TeamMembersSizeDTO.class);
     }
-    
-    
+
     @Override
-    public Page<TeamDTO> getAllTeams(Pageable pageable) {
+    public Page<TeamMembersSizeDTO> getAllTeams(Pageable pageable, String search) {
+        if (search == null) search = "";
+
         if(userAuthorizationService.getCurrentUser().getUserRoles().contains(UserRole.ADMIN)){
-            return teamRepository.findAll(pageable).map((element) -> mapper.map(element, TeamDTO.class));
+            return teamRepository.findTeamsWithSearch(
+                    search.toLowerCase(),
+                    pageable
+            ).map((element) -> mapper.map(element, TeamMembersSizeDTO.class));
         }
-        return teamRepository.findByMembersId(userAuthorizationService.getCurrentUser().getId(),pageable).map((element) -> mapper.map(element, TeamDTO.class));
+        return teamRepository.findByMembersIdAndSearch(
+                userAuthorizationService.getCurrentUser().getId(),
+                search.toLowerCase(),
+                pageable
+        ).map((element) -> mapper.map(element, TeamMembersSizeDTO.class));
     }
-    
     
     @Override
     public Boolean isOwner(UUID id) {
@@ -124,20 +140,17 @@ public class TeamServiceImpl implements TeamService {
         team.getMembers().forEach(member -> member.getTeams().remove(team));
         teamRepository.deleteById(team.getId());
     }
-    
+
     @Override
     public Page<UserDTO> findFilteredTeamMembersById(UUID id, String search, Pageable pageable) {
         if (!teamRepository.existsById(id)) {
             throw new ResourceNotFoundException(Team.class.getName());
         }
-        
-        if (search == null) {
-            search = "";
-        }
-        
-        Page<User> userPage = teamRepository.searchMembersByTeamId(id, search.toLowerCase(), pageable);
-        List<UserDTO> userDTOs = userPage.get().map(u -> mapper.map(u, UserDTO.class)).toList();
-        
-        return new PageImpl<>(userDTOs, pageable, userDTOs.size());
+        if (search == null) search = "";
+        return teamRepository.searchMembersByTeamId(
+                id,
+                search.toLowerCase(),
+                pageable
+        ).map(element -> mapper.map(element, UserDTO.class));
     }
 }

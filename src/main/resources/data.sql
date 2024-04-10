@@ -28,6 +28,7 @@ INSERT INTO user_teams (users_id, teams_id) VALUES ('c220f2a3-ba6d-4142-9580-f05
 INSERT INTO user_teams (users_id, teams_id) VALUES ('e31ccd56-12a4-4416-8a3b-d5db4346c3fb', '38866342-0277-4d4b-b33a-54cb8fb10709');
 INSERT INTO user_teams (users_id, teams_id) VALUES ('e5396d00-4399-4f61-98a1-f3a993cbe953', '38866342-0277-4d4b-b33a-54cb8fb10709');
 INSERT INTO user_teams (users_id, teams_id) VALUES ('5b77ffd8-92e4-4e7f-9e7f-e0206e68006e', '38866342-0277-4d4b-b33a-54cb8fb10709');
+INSERT INTO user_teams (users_id, teams_id) VALUES ('9db29be9-9c87-4c28-9a77-f8a05261a2ef', '38866342-0277-4d4b-b33a-54cb8fb10709');
 
 
 INSERT INTO items (creation_date, item_id, owner_id, comment, quality_state, serial_code, state, type) VALUES ('2023-12-22', '0a6c47b9-a966-40ff-bb9f-db5ce6f5f24d', '5b77ffd8-92e4-4e7f-9e7f-e0206e68006e', 'už ne tak fajnový stolík', 'USED','86748615641345', 'BORROWED', 'TABLE');

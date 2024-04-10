@@ -35,7 +35,6 @@ import java.util.UUID;
 @Validated
 @Slf4j
 public class TeamController {
-    
     private final TeamService teamService;
     
     @Operation(summary = "Create new team", responses = {
@@ -137,7 +136,6 @@ public class TeamController {
         return teamService.removeUserFromTeam(teamId, userId);
     }
     
-    
     @Operation(summary = "Get all teams", responses = {
             @ApiResponse(
                     description = "Get teams successful",
@@ -152,10 +150,12 @@ public class TeamController {
     }, description = "Get all teams")
     @GetMapping
     @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")
-    public Page<TeamDTO> getAllTeams(@PageableDefault(size = 20) Pageable pageable) {
-        return teamService.getAllTeams(pageable);
+    public Page<TeamMembersSizeDTO> getAllTeams(
+            @Parameter(name = "search", schema = @Schema(implementation = String.class))
+            @RequestParam(required = false) String search,
+            @PageableDefault(size = 20) Pageable pageable) {
+        return teamService.getAllTeams(pageable, search);
     }
-    
     
     @Operation(summary = "Get team by its uuid", responses = {
             @ApiResponse(
@@ -203,9 +203,7 @@ public class TeamController {
     public void deleteTeam(@PathVariable UUID id) {
         teamService.deleteTeamById(id);
     }
-    
-    
-    
+
     @Operation(summary = "Get members with search", responses = {
             @ApiResponse(
                     description = "Get members successful",
