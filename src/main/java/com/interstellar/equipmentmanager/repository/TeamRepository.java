@@ -14,8 +14,9 @@ import java.util.UUID;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, UUID>, JpaSpecificationExecutor<Team> {
+    
     Page<Team> findAll(Pageable pageable);
-
+    
     @Query("""
         SELECT members
         FROM Team t left join t.members members
@@ -24,7 +25,7 @@ public interface TeamRepository extends JpaRepository<Team, UUID>, JpaSpecificat
         )
     """)
     Page<User> searchMembersByTeamId(UUID id, String search, Pageable pageable);
-
+    
     @Query("""
         SELECT distinct team
         FROM Team team join team.members members
@@ -34,7 +35,7 @@ public interface TeamRepository extends JpaRepository<Team, UUID>, JpaSpecificat
             OR lower(members.login) LIKE %:search%
     """)
     Page<Team> findByMembersIdAndSearch(@Param("id") UUID id, @Param("search") String search, Pageable pageable);
-
+    
     @Query("""
         SELECT distinct team
         FROM Team team join team.members members
@@ -43,6 +44,8 @@ public interface TeamRepository extends JpaRepository<Team, UUID>, JpaSpecificat
             OR lower(members.login) LIKE %:search%
     """)
     Page<Team> findTeamsWithSearch(@Param("search") String search, Pageable pageable);
-
+    
     boolean existsByTeamName(String teamName);
+    
+    boolean existsByTeamNameAndIdIsNot(String teamName, UUID id);
 }
