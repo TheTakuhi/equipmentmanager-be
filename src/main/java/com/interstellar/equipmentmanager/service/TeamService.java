@@ -12,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface TeamService {
-    
-    
     TeamDTO createTeam(TeamCreateDTO teamCreateDTO);
     
     TeamDTO updateTeam(UUID id, TeamEditDTO teamEditDTO);
@@ -25,9 +23,9 @@ public interface TeamService {
     Team getTeamById(UUID id);
     
     TeamMembersSizeDTO findTeamById(UUID id);
-    
-    Page<TeamDTO> getAllTeams(Pageable pageable);
-    
+
+    Page<TeamMembersSizeDTO> getAllTeams(Pageable pageable, String search);
+
     Boolean isOwner(UUID id);
     
     void deleteTeamById(UUID teamId);
