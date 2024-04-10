@@ -2,7 +2,6 @@ package com.interstellar.equipmentmanager.service.impl;
 
 import com.interstellar.equipmentmanager.exception.ResourceConflictException;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;
-import com.interstellar.equipmentmanager.model.dto.CustomPageDTO;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamCreateDTO;
 import com.interstellar.equipmentmanager.model.dto.team.in.TeamEditDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamDTO;
@@ -18,57 +17,58 @@ import com.interstellar.equipmentmanager.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class TeamServiceImpl implements TeamService {
+    
     private final TeamRepository teamRepository;
     private final ModelMapper mapper;
     private final UserAuthorizationService userAuthorizationService;
     private final UserService userService;
-
+    
+    
     @Override
     public TeamDTO createTeam(TeamCreateDTO teamCreateDTO) {
         Team team = mapper.map(teamCreateDTO, Team.class);
-
+        
         if (teamRepository.existsByTeamName(team.getTeamName())) {
             throw new ResourceConflictException("Team already exists with name: [%s]".formatted(team.getTeamName()));
         }
-
+        
         team.setOwner(mapper.map(userAuthorizationService.getCurrentUser(), User.class));
         team.setMembers(team.getMembers().stream().map(x -> userService.getOriginalUser(x.getId())).collect(Collectors.toList()));
         team.getMembers().forEach(x -> x.getTeams().add(team));
         return mapper.map(teamRepository.save(team), TeamDTO.class);
     }
-
+    
     @Override
     public TeamDTO updateTeam(UUID id, TeamEditDTO teamEditDTO) {
         Team team = teamRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Team.class.getName(), "id", id.toString()));
-
-        if (teamRepository.existsByTeamName(team.getTeamName())) {
-            throw new ResourceConflictException("Team already exists with name: [%s]".formatted(team.getTeamName()));
-        }
-
         Team newTeam = mapper.map(teamEditDTO, Team.class);
+        
+        if (teamRepository.existsByTeamNameAndIdIsNot(newTeam.getTeamName(), id)) {
+            throw new ResourceConflictException("Team already exists with name: [%s]".formatted(newTeam.getTeamName()));
+        }
+        
         team.getMembers().forEach(member -> member.getTeams().remove(team));
         team.getMembers().clear();
-        team.getMembers().addAll(newTeam.getMembers().stream().map(x -> userService.getOriginalUser(x.getId())).collect(Collectors.toList()));
+        team.getMembers().addAll(newTeam.getMembers().stream().map(x -> userService.getOriginalUser(x.getId())).toList());
         team.getMembers().forEach(member -> member.getTeams().add(team));
-
+        
         if (newTeam.getOwner() != null) {
             User user = userService.getOriginalUser(newTeam.getOwner().getId());
             team.setOwner(user);
             user.getOwnedTeams().add(team);
         }
         team.setTeamName(newTeam.getTeamName());
+        
         return mapper.map(teamRepository.save(team), TeamDTO.class);
     }
     
@@ -76,9 +76,11 @@ public class TeamServiceImpl implements TeamService {
     public TeamDTO addUserToTeam(UUID teamId, UUID userId) {
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new ResourceNotFoundException(Team.class.getName(), "id", teamId.toString()));
         User user = userService.getOriginalUser(userId);
+        
         if (team.getMembers().contains(user)) {
             throw new ResourceConflictException(String.format("User with id %s cannot be add into team with id %s, because he/she is already member of the team.", userId, teamId));
         }
+        
         team.getMembers().add(user);
         user.getTeams().add(team);
         
@@ -89,11 +91,14 @@ public class TeamServiceImpl implements TeamService {
     public TeamDTO removeUserFromTeam(UUID teamId, UUID userId) {
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new ResourceNotFoundException(Team.class.getName(), "id", teamId.toString()));
         User user = userService.getOriginalUser(userId);
+        
         if (!team.getMembers().contains(user)) {
             throw new ResourceNotFoundException(String.format("User with id %s cannot be removed from team with id %s, because he/she is not member of the team.", userId, teamId));
         }
+        
         team.getMembers().remove(user);
         user.getTeams().remove(team);
+        
         return mapper.map(teamRepository.save(team), TeamDTO.class);
     }
     
@@ -107,11 +112,12 @@ public class TeamServiceImpl implements TeamService {
         Team team = getTeamById(id);
         return mapper.map(team, TeamMembersSizeDTO.class);
     }
-
+    
+    
     @Override
     public Page<TeamMembersSizeDTO> getAllTeams(Pageable pageable, String search) {
         if (search == null) search = "";
-
+        
         if(userAuthorizationService.getCurrentUser().getUserRoles().contains(UserRole.ADMIN)){
             return teamRepository.findTeamsWithSearch(
                     search.toLowerCase(),
@@ -124,6 +130,7 @@ public class TeamServiceImpl implements TeamService {
                 pageable
         ).map((element) -> mapper.map(element, TeamMembersSizeDTO.class));
     }
+    
     
     @Override
     public Boolean isOwner(UUID id) {
@@ -140,7 +147,7 @@ public class TeamServiceImpl implements TeamService {
         team.getMembers().forEach(member -> member.getTeams().remove(team));
         teamRepository.deleteById(team.getId());
     }
-
+    
     @Override
     public Page<UserDTO> findFilteredTeamMembersById(UUID id, String search, Pageable pageable) {
         if (!teamRepository.existsById(id)) {

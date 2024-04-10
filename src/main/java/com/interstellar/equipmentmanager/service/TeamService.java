@@ -6,6 +6,7 @@ import com.interstellar.equipmentmanager.model.dto.team.out.TeamDTO;
 import com.interstellar.equipmentmanager.model.dto.team.out.TeamMembersSizeDTO;
 import com.interstellar.equipmentmanager.model.dto.user.out.UserDTO;
 import com.interstellar.equipmentmanager.model.entity.Team;
+import com.interstellar.equipmentmanager.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
