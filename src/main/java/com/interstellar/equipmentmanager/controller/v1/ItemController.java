@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.controller;
+package com.interstellar.equipmentmanager.controller.v1;
 
 import com.interstellar.equipmentmanager.model.dto.CustomPageDTO;
 import com.interstellar.equipmentmanager.model.dto.item.in.ItemCreateDTO;

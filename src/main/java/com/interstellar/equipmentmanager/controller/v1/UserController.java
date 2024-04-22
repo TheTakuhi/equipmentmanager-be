@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.controller;
+package com.interstellar.equipmentmanager.controller.v1;
 
 import com.interstellar.equipmentmanager.annotation.AlphaString;
 import com.interstellar.equipmentmanager.exception.ResourceNotFoundException;

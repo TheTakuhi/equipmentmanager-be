@@ -56,6 +56,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDTO updateItem(UUID id, ItemEditDTO itemEditDTO) {
         Item item = itemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(Item.class.getName(), "id", id.toString()));
+
+        if (itemRepository.existsBySerialCodeAndIdIsNot(itemEditDTO.getSerialCode(), id)) {
+            throw new ResourceConflictException("Item with serial code %s already exists".formatted(itemEditDTO.getSerialCode()));
+        }
+
         item.setSerialCode(itemEditDTO.getSerialCode());
         item.setComment(itemEditDTO.getComment());
         item.setType(itemEditDTO.getType());
