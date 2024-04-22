@@ -1,4 +1,4 @@
-package com.interstellar.equipmentmanager.controller;
+package com.interstellar.equipmentmanager.controller.v1;
 
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.out.KeycloakUserDTO;
 import com.interstellar.equipmentmanager.model.dto.keycloak.user.in.KeycloakUserEditDTO;

@@ -1,10 +1,9 @@
 variables:
-  NETWORK_NAME: "equipmentmanager-network"
+  NETWORK_NAME: "equipment-manager-bridge"
   CONTAINER_NAME: "equipment-manager"
   IMAGE_NAME: "equipment-manager-image-$CI_COMMIT_BRANCH"
   ENVIRONMENT_NAME: "$CI_COMMIT_BRANCH"
   DOCKER_TLS_CERTDIR: ""
-
 
 stages:
   - build
@@ -14,6 +13,42 @@ stages:
   login:
     - &login docker login -u $AZURE_USERNAME -p $AZURE_PASSWORD $AZURE_REGISTRY
 
+build-production:
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+  stage: build
+  image: docker:20.10.17
+  services:
+    - docker:20.10-dind
+  only:
+    - production
+  before_script:
+    - *login
+  script:
+    - docker build . -t $IMAGE_NAME --build-arg PROFILE=$ENVIRONMENT_NAME
+    - docker tag $IMAGE_NAME $AZURE_REGISTRY/$IMAGE_NAME
+    - docker push $AZURE_REGISTRY/$IMAGE_NAME
+  tags:
+    - ah2-docker
+
+deploy-production:
+  stage: deploy
+  environment:
+    name: production deploy
+  only:
+    - production
+  before_script:
+    - *login
+  script:
+    - docker pull $AZURE_REGISTRY/$IMAGE_NAME
+    - docker stop $CONTAINER_NAME || true
+    - docker rm $CONTAINER_NAME || true
+    - docker create --name $CONTAINER_NAME -p 10100:8080 $AZURE_REGISTRY/$IMAGE_NAME
+    - docker network connect $NETWORK_NAME $CONTAINER_NAME
+    - docker start $CONTAINER_NAME
+  tags:
+    - ah2-shell
+
 build-staging:
   variables:
     DOCKER_HOST: tcp://docker:2375
@@ -21,12 +56,12 @@ build-staging:
   image: docker:20.10.17
   services:
     - docker:20.10-dind
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+  only:
+    - staging
   before_script:
     - *login
   script:
-    - docker build . -t $IMAGE_NAME
+    - docker build . -t $IMAGE_NAME --build-arg PROFILE=$ENVIRONMENT_NAME
     - docker tag $IMAGE_NAME $AZURE_REGISTRY/$IMAGE_NAME
     - docker push $AZURE_REGISTRY/$IMAGE_NAME
   tags:
@@ -34,20 +69,17 @@ build-staging:
 
 deploy-staging:
   stage: deploy
-  variables:
-    GIT_STRATEGY: clone
   environment:
-    name: staging deploy
-    url: http://10.14.41.118/
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    name: production deploy
+  only:
+    - staging
   before_script:
     - *login
   script:
     - docker pull $AZURE_REGISTRY/$IMAGE_NAME
     - docker stop $CONTAINER_NAME || true
     - docker rm $CONTAINER_NAME || true
-    - docker create --name $CONTAINER_NAME -p 10074:10074 $AZURE_REGISTRY/$IMAGE_NAME
+    - docker create --name $CONTAINER_NAME -p 10100:8080 $AZURE_REGISTRY/$IMAGE_NAME
     - docker network connect $NETWORK_NAME $CONTAINER_NAME
     - docker start $CONTAINER_NAME
   tags:
