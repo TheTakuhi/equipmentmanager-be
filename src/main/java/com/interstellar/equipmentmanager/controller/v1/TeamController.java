@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/teams")
+@RequestMapping("/v1/teams")
 @RequiredArgsConstructor
 @Tag(name = "Teams", description = "Endpoints for managing teams")
 @SecurityRequirement(name = "keycloak")

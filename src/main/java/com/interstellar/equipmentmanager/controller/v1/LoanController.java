@@ -28,7 +28,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/loans")
+@RequestMapping("/v1/loans")
 @RequiredArgsConstructor
 @Tag(name = "Loans", description = "Endpoints for managing loans")
 @SecurityRequirement(name = "keycloak")
