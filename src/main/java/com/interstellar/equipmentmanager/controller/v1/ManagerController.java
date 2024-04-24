@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/managers")
+@RequestMapping("/v1/managers")
 @Tag(name = "Managers", description = "Endpoints for managing managers")
 @SecurityRequirement(name = "keycloak")
 @PreAuthorize("@userAuthorizationServiceImpl.hasMinimalRole('MANAGER')")

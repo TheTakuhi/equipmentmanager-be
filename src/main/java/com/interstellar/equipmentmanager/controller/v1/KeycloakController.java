@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/keycloak")
+@RequestMapping("/v1/keycloak")
 @RequiredArgsConstructor
 @Tag(name = "Keycloak and sync", description = "endpoints for keycloak communication")
 @SecurityRequirement(name = "keycloak")

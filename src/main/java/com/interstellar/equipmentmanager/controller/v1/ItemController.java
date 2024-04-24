@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/v1/items")
 @RequiredArgsConstructor
 @Tag(name = "Items", description = "Endpoints for managing items")
 @SecurityRequirement(name = "keycloak")
