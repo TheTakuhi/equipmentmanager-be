@@ -1,0 +1,54 @@
+spring:
+  datasource:
+    hikari:
+      auto-commit: true
+    username: postgres
+    password: admin
+    url: jdbc:postgresql://localhost:5434/equipment-manager-db
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: on
+    defer-datasource-initialization: true
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  sql:
+    init:
+      mode: always
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://staging.int.tieto.com/keycloak/auth
+          jwk-set-uri: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/token
+          certs: https://staging.int.tieto.com/keycloak/auth/realms/staging-realm/protocol/openid-connect/certs
+
+ldapQL:
+  base-url: http://10.14.41.125:10082
+  api-key: 9bd778b1-b6c9-427d-b1df-cce5f8e90047
+
+keycloak:
+  auth-server-url: https://staging.int.tieto.com/keycloak/auth
+  realm: staging-realm
+  resource: equipment-manager-fe
+  principal-attribute: preferred_username
+  ssl-required: external
+  use-resource-role-mappings: true
+  bearer-only: true
+  secret: mLK748gTJELM5WvTKB1D4PWuh3I70AFC
+
+keycloak-admin-cli:
+  client-id: admin-cli
+  client-secret: Q1Wu0SpXMiQ8B3zDvNOcYQfac39PVAAK
+
+scheduler:
+  timezone: Europe/Prague
+  syncUsersFromLdap:
+    cron: "0 0 2 * * *"
+
+web:
+  cors:
+    allowed-origins: http://localhost:3000, http://127.0.0.1:3000, http://localhost:5173, http://127.0.0.1:5173
+    allowed-methods: POST, PUT, DELETE, GET, PATCH, HEAD, OPTIONS
+    allowed-headers: Content-Type, X-Requested-With, Accept, Authorization, Origin, Access-Control-Request-Method,
+      Access-Control-Request-Headers, Content-Disposition
